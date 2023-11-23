@@ -9,7 +9,7 @@ app.use(express.json())
 app.use(cors())
 require("dotenv").config();
 
-mongoose.connect(process.env.MONGO_URI)
+mongoose.connect("mongodb://127.0.0.1:27017/Kanoah?directConnection=true&serverSelectionTimeoutMS=2000&appName=mongosh+1.10.6")
 .then(()=>{
     console.log("Database Connected")
 }).catch((err)=>{
