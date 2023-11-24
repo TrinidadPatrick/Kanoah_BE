@@ -33,6 +33,7 @@ module.exports.sendChat = async (req,res) => {
     const data = req.body
     const participants = data.participants
     const message = data.messages
+    serviceInquired = data.serviceInquired
 
     //check if the conversation between user is existing
     const checkChatExisting = await chats.findOne({conversationId : req.body.conversationId})
@@ -41,7 +42,7 @@ module.exports.sendChat = async (req,res) => {
     if(checkChatExisting != null)
     {
         try {
-            const result = await chats.create({conversationId : existingConversationId, participants, message})
+            const result = await chats.create({conversationId : existingConversationId, participants,serviceInquired, message})
             return res.json({result})
         } catch (error) {
             return res.json({status : "failed", message : error})
@@ -51,7 +52,7 @@ module.exports.sendChat = async (req,res) => {
     else
     {
         try {
-            const result = await chats.create({conversationId, participants, message})
+            const result = await chats.create({conversationId, participants,serviceInquired, message})
             return res.json({result})
         } catch (error) {
             return res.json({status : "failed", message : error})
@@ -67,9 +68,10 @@ module.exports.getUserChats = async (req, res) => {
     const { userId } = req.params;
 
     try {
-        const result = await chats.find({participants : {$all: [userId]}}).populate('message.sender', 'username')
-        .populate('message.receiver', 'username')
-        .populate('participants', 'username')
+        const result = await chats.find({participants : {$all: [userId]}}).populate('message.sender', 'username profileImage')
+        .populate('message.receiver', 'username profileImage')
+        .populate('participants', 'username profileImage')
+        .populate('serviceInquired', 'basicInformation.ServiceTitle')
         return res.json(result)
     } catch (error) {
         return res.json({status : "failed", message : error})
