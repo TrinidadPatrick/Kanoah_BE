@@ -6,7 +6,7 @@ require("dotenv").config();
 
 // Get All Services
 module.exports.getServices = async (req,res) =>{
-    const services = await Service.find().populate('owner', 'firstname lastname')
+    const services = await Service.find().populate('owner', 'firstname lastname profileImage')
     return res.json({service : services});
 }
 
@@ -24,7 +24,6 @@ module.exports.addService = async (req,res) => {
 
     const fullname = result.firstname + " " + result.lastname
   
-    console.log(result)
     try {
 
         const result = await Service.create({userId, owner: userId, basicInformation, advanceInformation, address, serviceHour, tags, createdAt})
@@ -162,7 +161,6 @@ module.exports.getFeaturedImages = async (req,res) => {
     const {userId} = req.params
     try {
         const images = await Service.findOne({userId}).select({featuredImages : 1})
-        console.log(images)
         if(images)
         {
             return res.json({images : images.featuredImages})

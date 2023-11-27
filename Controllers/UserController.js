@@ -274,15 +274,13 @@ module.exports.login = async (req,res) => {
         const comparePassword = await bcrypt.compare(password, result.password)
         if(comparePassword){
             const accessToken = generateToken({ _id : result._id})
-
-            return res.json({status : 'authenticated', accessToken })
+            return res.status(200).json({ status: 'authenticated', accessToken });
         }else {
-            return res.json({status : 'invalid username or password'})
+            return res.status(401).json({ status: 'invalid username or password' });
         }
         
     }else{
-        // console.log("Hello")
-        return res.json({status : 'account not found'})
+        return res.status(404).json({ status: 'account not found' });
     }
     
 }
