@@ -2,9 +2,8 @@
 const {Router} = require('express')
 const { getAllChats, sendChat, getUserChats } = require('../Controllers/ChatController')
 const { getServices, addService, getService, addGalleryImage, getGalleryImages, deleteImage, deleteMultipleImages, addFeaturedImage, getFeaturedImages, deleteFeaturedImage, deleteMultipleFeaturedImages, updateProfilePicture, getServiceInfo } = require('../Controllers/ServiceController')
-const authenticateToken = require('../Controllers/UserController')
 const router = Router()
-const {register, verifyEmail, verifyOTP, login, forgotPassword, newPassword, submitOtpForNewPassword, verifyUsername, getUsers, getUser, updateUser, verifyPassword, updatePassword, deactivateAccount, refresh, profile} = require('../Controllers/UserController')
+const {register, verifyEmail, verifyOTP, login, forgotPassword, newPassword, submitOtpForNewPassword, verifyUsername, getUsers, getUser, updateUser, verifyPassword, updatePassword, deactivateAccount, refresh, profile, handleFb, handleFbLogin} = require('../Controllers/UserController')
 
 // User Routes
 router.post("/register", register)
@@ -22,6 +21,7 @@ router.patch("/deactivateAccount", deactivateAccount)
 router.put("/updateUser/:_id", updateUser)
 router.get("/getUsers", getUsers)
 router.get("/getUser/:_id", getUser)
+
 
 // Temp Service Route
 router.get("/getServices", getServices) //Get All Temp Services

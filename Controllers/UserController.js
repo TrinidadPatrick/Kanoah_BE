@@ -305,8 +305,6 @@ module.exports.profile =  (req,res) => {
   });
 }
 
-
-
 // Forgot Password-----------------------------------------------------------------------------FORGOT PASSWORD---------------------------------------
 let FPcode = ''
 module.exports.forgotPassword = async (req,res) => {
@@ -386,3 +384,4 @@ module.exports.newPassword = async (req,res) => {
         res.json({status : "failed"})
     }
 }
+
