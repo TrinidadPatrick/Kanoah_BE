@@ -68,9 +68,9 @@ module.exports.getUserChats = async (req, res) => {
     const { userId } = req.params;
 
     try {
-        const result = await chats.find({participants : {$all: [userId]}}).populate('message.sender', 'username profileImage')
-        .populate('message.receiver', 'username profileImage')
-        .populate('participants', 'username profileImage')
+        const result = await chats.find({participants : {$all: [userId]}}).populate('message.sender', 'username profileImage firstname lastname')
+        .populate('message.receiver', 'username profileImage firstname lastname')
+        .populate('participants', 'username profileImage firstname lastname')
         .populate('serviceInquired', 'basicInformation.ServiceTitle')
         return res.json(result)
     } catch (error) {
