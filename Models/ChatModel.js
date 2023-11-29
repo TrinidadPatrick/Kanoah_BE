@@ -4,6 +4,7 @@ const chatSchema = new mongoose.Schema({
     conversationId: {type : String, required: true},
     participants: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User_Info' }],
     serviceInquired : { type: mongoose.Schema.Types.ObjectId, ref: 'services' },
+    readBy : [{ type: mongoose.Schema.Types.ObjectId, ref: 'User_Info' }],
     message : 
     {
         sender : {type: mongoose.Schema.Types.ObjectId, ref: 'User_Info'},

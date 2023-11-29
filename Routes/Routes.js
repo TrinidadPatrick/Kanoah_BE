@@ -1,6 +1,6 @@
 
 const {Router} = require('express')
-const { getAllChats, sendChat, getUserChats } = require('../Controllers/ChatController')
+const { getAllChats, sendChat, getUserChats, readChat } = require('../Controllers/ChatController')
 const { getServices, addService, getService, addGalleryImage, getGalleryImages, deleteImage, deleteMultipleImages, addFeaturedImage, getFeaturedImages, deleteFeaturedImage, deleteMultipleFeaturedImages, updateProfilePicture, getServiceInfo } = require('../Controllers/ServiceController')
 const router = Router()
 const {register, verifyEmail, verifyOTP, login, forgotPassword, newPassword, submitOtpForNewPassword, verifyUsername, getUsers, getUser, updateUser, verifyPassword, updatePassword, deactivateAccount, refresh, profile, handleFb, handleFbLogin} = require('../Controllers/UserController')
@@ -51,6 +51,7 @@ router.post("/updateProfilePicture", updateProfilePicture)
 // Chat routes
 router.get("/getAllChats", getAllChats)
 router.post("/sendChat", sendChat)
+router.post("/readChat", readChat)
 router.get("/getUserChats/:userId", getUserChats)
 
 module.exports = router;

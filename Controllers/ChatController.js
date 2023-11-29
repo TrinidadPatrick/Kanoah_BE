@@ -33,8 +33,8 @@ module.exports.sendChat = async (req,res) => {
     const data = req.body
     const participants = data.participants
     const message = data.messages
-    serviceInquired = data.serviceInquired
-
+    const readBy = data.readBy
+    const serviceInquired = data.serviceInquired
     //check if the conversation between user is existing
     const checkChatExisting = await chats.findOne({conversationId : req.body.conversationId})
     
@@ -42,7 +42,7 @@ module.exports.sendChat = async (req,res) => {
     if(checkChatExisting != null)
     {
         try {
-            const result = await chats.create({conversationId : existingConversationId, participants,serviceInquired, message})
+            const result = await chats.create({conversationId : existingConversationId, participants,serviceInquired,readBy, message})
             return res.json({result})
         } catch (error) {
             return res.json({status : "failed", message : error})
@@ -52,7 +52,7 @@ module.exports.sendChat = async (req,res) => {
     else
     {
         try {
-            const result = await chats.create({conversationId, participants,serviceInquired, message})
+            const result = await chats.create({conversationId, participants,serviceInquired, readBy, message})
             return res.json({result})
         } catch (error) {
             return res.json({status : "failed", message : error})
@@ -79,4 +79,25 @@ module.exports.getUserChats = async (req, res) => {
 
     
   };
+
+// handle readchat
+module.exports.readChat = async (req,res) => {
+    const updatedReadBy = req.body.updatedReadBy
+    const conversationId = req.body.conversationIdParam
+    const filtered = await chats.find({conversationId})
+
+    const update = {
+        $set: {
+          'readBy': updatedReadBy, // Replace 'fieldName' with the actual field you want to update
+        }
+      };
+
+    try {
+        const result = await chats.updateMany({conversationId}, update)
+        console.log(result)
+    } catch (error) {
+        return res.error(error)
+    }
+    
+}
   
