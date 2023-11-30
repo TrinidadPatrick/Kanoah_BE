@@ -2,7 +2,7 @@ const mongoose = require('mongoose')
 
 const chatSchema = new mongoose.Schema({
     conversationId: {type : String, required: true},
-    participants: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User_Info' }],
+    participants: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User_Info', index : true }],
     serviceInquired : { type: mongoose.Schema.Types.ObjectId, ref: 'services' },
     readBy : [{ type: mongoose.Schema.Types.ObjectId, ref: 'User_Info' }],
     message : 
