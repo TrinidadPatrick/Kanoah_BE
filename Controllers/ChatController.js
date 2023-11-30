@@ -32,7 +32,7 @@ module.exports.sendChat = async (req,res) => {
     const existingConversationId = req.body.conversationId
     const data = req.body
     const participants = data.participants
-    const message = data.messages
+    const message = data.message
     const readBy = data.readBy
     const serviceInquired = data.serviceInquired
     //check if the conversation between user is existing

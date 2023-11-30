@@ -3,7 +3,7 @@ const {Router} = require('express')
 const { getAllChats, sendChat, getUserChats, readChat } = require('../Controllers/ChatController')
 const { getServices, addService, getService, addGalleryImage, getGalleryImages, deleteImage, deleteMultipleImages, addFeaturedImage, getFeaturedImages, deleteFeaturedImage, deleteMultipleFeaturedImages, updateProfilePicture, getServiceInfo } = require('../Controllers/ServiceController')
 const router = Router()
-const {register, verifyEmail, verifyOTP, login, forgotPassword, newPassword, submitOtpForNewPassword, verifyUsername, getUsers, getUser, updateUser, verifyPassword, updatePassword, deactivateAccount, refresh, profile, handleFb, handleFbLogin} = require('../Controllers/UserController')
+const {register, verifyEmail, verifyOTP, login, forgotPassword, newPassword, submitOtpForNewPassword, verifyUsername, getUsers, getUser, updateUser, verifyPassword, updatePassword, deactivateAccount, refresh, profile, handleFb, handleFbLogin, getUserInfo} = require('../Controllers/UserController')
 
 // User Routes
 router.post("/register", register)

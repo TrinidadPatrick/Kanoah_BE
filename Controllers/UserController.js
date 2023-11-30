@@ -14,23 +14,54 @@ const generateRefreshToken = (user) => {
 
 // Get All Users
 module.exports.getUsers = async (req,res) =>{
+    const token = req.headers.authorization?.split(' ')[1];
     const users = await user.find()
-    return res.json(users);
+
+    if (!token) {
+        return res.status(401).json({ error: 'Unauthorized' });
+      }
+    
+      jwt.verify(token, process.env.SECRET_KEY, (err, user) => {
+        if (err) {
+          return res.status(403).json({ error: 'Forbidden' });
+        }
+        else
+        {
+            return res.json(users);
+        }
+    
+        
+      });
+    
 }
 
 // Get specific User
 module.exports.getUser = async (req,res) => {
-    try {
-        const id = req.params._id
-        const userInfo = await user.findOne({_id : id})
-        return res.json(userInfo)
-    } catch (error) {
+    const token = req.headers.authorization?.split(' ')[1];
+    const id = req.params._id
+    const userInfo = await user.findOne({_id : id})
+    // console.log(token)
+
+    if (!token) {
+        return res.status(401).json({ error: 'Unauthorized' });
+      }
+    
+      jwt.verify(token, process.env.SECRET_KEY, (err) => {
+        if (err) {
+          return res.status(403).json({ error: 'Forbidden' });
+        }
+        else
+        {
+            return res.json(userInfo);
+        }
+    
         
-    }
-        
+      }); 
     
    
 }
+
+
 
 // Verify Password for update information
 module.exports.verifyPassword = async (req,res)=>{
@@ -51,6 +82,7 @@ module.exports.verifyPassword = async (req,res)=>{
     }
     
 }
+
 
 // Update user information
 module.exports.updateUser = async (req,res) =>{
