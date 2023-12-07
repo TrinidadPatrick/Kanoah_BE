@@ -1,7 +1,7 @@
 
 const {Router} = require('express')
-const { getAllChats, sendChat, getUserChats, readChat } = require('../Controllers/ChatController')
-const { getServices, addService, getService, addGalleryImage, getGalleryImages, deleteImage, deleteMultipleImages, addFeaturedImage, getFeaturedImages, deleteFeaturedImage, deleteMultipleFeaturedImages, updateProfilePicture, getServiceInfo } = require('../Controllers/ServiceController')
+const { getAllChats, sendChat, getUserChats, readChat, deleteConvo } = require('../Controllers/ChatController')
+const { getServices, addService, getService, addGalleryImage, getGalleryImages, deleteImage, deleteMultipleImages, addFeaturedImage, getFeaturedImages, deleteFeaturedImage, deleteMultipleFeaturedImages, updateProfilePicture, getServiceInfo, getServiceProfile } = require('../Controllers/ServiceController')
 const router = Router()
 const {register, verifyEmail, verifyOTP, login, forgotPassword, newPassword, submitOtpForNewPassword, verifyUsername, getUsers, getUser, updateUser, verifyPassword, updatePassword, deactivateAccount, refresh, profile, handleFb, handleFbLogin, getUserInfo} = require('../Controllers/UserController')
 
@@ -20,14 +20,15 @@ router.patch("/updatePassword/", updatePassword)
 router.patch("/deactivateAccount", deactivateAccount)
 router.put("/updateUser/:_id", updateUser)
 router.get("/getUsers", getUsers)
-router.get("/getUser/:_id", getUser)
+router.get("/getUser", getUser)
 
 
-// Temp Service Route
-router.get("/getServices", getServices) //Get All Temp Services
-router.post("/addService", addService) //Get All Temp Services
-router.get("/getService/:userId", getService) //Get All Temp Services
+//  Service Route
+router.get("/getServices", getServices) //Get All Services
+router.post("/addService", addService) //Add Service
+router.get("/getService/:userId", getService) //Get service by Userid
 router.get("/getServiceInfo/:_id", getServiceInfo) //Get service info in view service
+router.get("/getServiceProfile", getServiceProfile) //Get service info in profile service
 
 
 // Gallery Images ROute
@@ -53,5 +54,6 @@ router.get("/getAllChats", getAllChats)
 router.post("/sendChat", sendChat)
 router.post("/readChat", readChat)
 router.get("/getUserChats/:userId", getUserChats)
+router.delete("/deleteConvo/:convoId", deleteConvo)
 
 module.exports = router;

@@ -100,4 +100,15 @@ module.exports.readChat = async (req,res) => {
     }
     
 }
+
+// Deletes the conversation
+module.exports.deleteConvo = async (req,res) => {
+    const {convoId} = req.params
+    try {
+        const result = await chats.deleteMany({conversationId : convoId})
+        return res.json({result})
+    } catch (error) {
+        return res.json(error)
+    }
+}
   

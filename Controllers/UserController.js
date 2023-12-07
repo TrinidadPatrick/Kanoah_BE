@@ -1,6 +1,7 @@
 const user = require('../Models/UserModel')
 const bcrypt = require('bcrypt')
 const nodemailer = require('nodemailer')
+const cookieParser = require('cookie-parser');
 require("dotenv").config();
 const jwt = require('jsonwebtoken')
 
@@ -36,30 +37,40 @@ module.exports.getUsers = async (req,res) =>{
 }
 
 // Get specific User
-module.exports.getUser = async (req,res) => {
-    const token = req.headers.authorization?.split(' ')[1];
-    const id = req.params._id
-    const userInfo = await user.findOne({_id : id})
-    // console.log(token)
-
-    if (!token) {
-        return res.status(401).json({ error: 'Unauthorized' });
+module.exports.getUser = async (req, res) => {
+    const getuserInfo = async (userId) => {
+      try {
+        const userInfo = await user.findOne({ _id: userId });
+        return res.json(userInfo);
+      } catch (error) {
+        return error;
       }
-    
-      jwt.verify(token, process.env.SECRET_KEY, (err) => {
-        if (err) {
-          return res.status(403).json({ error: 'Forbidden' });
-        }
-        else
+    };
+  
+    const token = req.headers.authorization?.split(' ')[1];
+
+  
+    if (!token) {
+      return res.status(401).json({ error: 'Unauthorized' });
+    }
+  
+    try {
+      jwt.verify(token, process.env.SECRET_KEY, (err, user)=>{
+        if(err)
         {
-            return res.json(userInfo);
+            return res.status(403).json({ error: 'Forbidden' });
         }
-    
+        getuserInfo(user._id);
+      });
+    } catch (err) {
         
-      }); 
-    
-   
-}
+      if (err.name === 'TokenExpiredError') {
+        return res.status(401).json({ error: 'Token expired' });
+      } else {
+        return res.status(403).json({ error: 'Forbidden' });
+      }
+    }
+  };
 
 
 
@@ -306,6 +317,7 @@ module.exports.login = async (req,res) => {
         const comparePassword = await bcrypt.compare(password, result.password)
         if(comparePassword){
             const accessToken = generateToken({ _id : result._id})
+            res.cookie('access_token', accessToken, { httpOnly: true, secure: true });
             return res.status(200).json({ status: 'authenticated', accessToken });
         }else {
             return res.status(401).json({ status: 'invalid username or password' });

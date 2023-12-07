@@ -2,6 +2,7 @@ const Service = require('../Models/ServiceModel')
 const user = require('../Models/UserModel')
 const bcrypt = require('bcrypt')
 const nodemailer = require('nodemailer')
+const jwt = require('jsonwebtoken')
 require("dotenv").config();
 
 // Get All Services
@@ -231,5 +232,42 @@ module.exports.updateProfilePicture = async (req,res) => {
     } catch (error) {
         return res.json({status : "failed" , message : err})
     }
+}
+
+// Get Service Info for edit Service
+module.exports.getServiceProfile = async (req,res) => {
+    const getServiceInfo = async (id) => {
+        try {
+          const serviceInfo = await Service.findOne({ userId: id });
+          return res.json(serviceInfo);
+        } catch (error) {
+          return error;
+        }
+      };
+    
+      const token = req.headers.authorization?.split(' ')[1];
+  
+    
+      if (!token) {
+        return res.status(401).json({ error: 'Unauthorized' });
+      }
+    
+      try {
+        jwt.verify(token, process.env.SECRET_KEY, (err, user)=>{
+          if(err)
+          {
+              return res.status(403).json({ errors: 'Forbidden' });
+          }
+          getServiceInfo(user._id);
+        });
+      } catch (err) {
+          
+        if (err.name === 'TokenExpiredError') {
+          return res.status(401).json({ error: 'Token expired' });
+        } else {
+          return res.status(403).json({ error: 'Forbidden' });
+          
+        }
+      }
 }
     
