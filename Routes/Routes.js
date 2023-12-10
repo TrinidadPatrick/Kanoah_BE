@@ -1,7 +1,7 @@
 
 const {Router} = require('express')
 const { getAllChats, sendChat, getUserChats, readChat, deleteConvo } = require('../Controllers/ChatController')
-const { getServices, addService, getService, addGalleryImage, getGalleryImages, deleteImage, deleteMultipleImages, addFeaturedImage, getFeaturedImages, deleteFeaturedImage, deleteMultipleFeaturedImages, updateProfilePicture, getServiceInfo, getServiceProfile } = require('../Controllers/ServiceController')
+const { getServices, addService, getService, addGalleryImage, getGalleryImages, deleteImage, deleteMultipleImages, addFeaturedImage, getFeaturedImages, deleteFeaturedImage, deleteMultipleFeaturedImages, updateProfilePicture, getServiceInfo, getServiceProfile, updateService } = require('../Controllers/ServiceController')
 const router = Router()
 const {register, verifyEmail, verifyOTP, login, forgotPassword, newPassword, submitOtpForNewPassword, verifyUsername, getUsers, getUser, updateUser, verifyPassword, updatePassword, deactivateAccount, refresh, profile, handleFb, handleFbLogin, getUserInfo} = require('../Controllers/UserController')
 
@@ -29,6 +29,7 @@ router.post("/addService", addService) //Add Service
 router.get("/getService/:userId", getService) //Get service by Userid
 router.get("/getServiceInfo/:_id", getServiceInfo) //Get service info in view service
 router.get("/getServiceProfile", getServiceProfile) //Get service info in profile service
+router.patch("/updateService/:userId", updateService) //Get service info in profile service
 
 
 // Gallery Images ROute
