@@ -4,6 +4,17 @@ const nodemailer = require('nodemailer')
 const cookieParser = require('cookie-parser');
 require("dotenv").config();
 const jwt = require('jsonwebtoken')
+const { StreamChat } = require('stream-chat');
+
+const apiKey = 'stvjq8j8spuj';
+const apiSecret = 'xqh6ydjxkgn7pqpzb484fd9ydc5jrsezrczcq7u9tz8hssyw5585t3mssjtat5xf';
+const appId = '1275878';
+
+// Initialize StreamChat
+const streamChat = StreamChat.getInstance(
+    "jbz7xh3ufm3p",
+    "2pdtnujsmwbtnjrxqrvrz9rujnqmpukssn5mnbefkxbyg4974tbx9gunpmy2jv9u"
+)
 
 const generateToken = (user) => {
     return jwt.sign({ _id : user._id }, process.env.SECRET_KEY, { expiresIn: '1day' });
@@ -97,7 +108,6 @@ module.exports.verifyPassword = async (req,res)=>{
 
 // Update user information
 module.exports.updateUser = async (req,res) =>{
-    console.log(req.body)
     const _id = req.params._id
     const data = req.body
     try {
@@ -157,20 +167,32 @@ module.exports.register = async (req,res) => {
         
         const hashedPassword = await bcrypt.hash(password, 10)
         await user.create({username, email, password : hashedPassword, firstname, lastname, contact, birthDate : birthDate, profileImage : image, verified : true, Address : null}).then((response)=>{
-            // const token = jwt.sign({
-            //     username : username,
-            //     email : email,
-            //     _id : response._id
-    
-            // }, process.env.SECRET_KEY)
-            // Generate jwt token
             const accessToken = generateToken({username : username, email : email, _id : response._id})
             const refreshToken = generateRefreshToken({username : username, email : email, _id : response._id})
+            const id = response._id
+
+            
+
+            const forStreamChat = async () => {
+                const exisitingUsers = await streamChat.queryUsers({id})
+                if(exisitingUsers.length > 0)
+                {
+                    return  status(400).send("User ID is taken")
+                }
+                await streamChat.upsertUser({name : username, id})
+            }
+
+            forStreamChat()
+
             res.json({message : "Registration completed Successfully" , status : "registered", accessToken : accessToken, refreshToken : refreshToken})
         }).catch((err)=>{
             res.send(err)
         })
+
+        
     }
+
+    
 
    
 }
@@ -186,7 +208,6 @@ module.exports.updatePassword = async (req,res) => {
       if(result != null)
       {
         const verifyPassword = await bcrypt.compare(password, result.password)
-        console.log(verifyPassword)
         if(verifyPassword)
         {
             await user.findOneAndUpdate({_id : id}, {password : hashedNewPassword})
@@ -208,7 +229,6 @@ module.exports.updatePassword = async (req,res) => {
 module.exports.deactivateAccount = async (req,res)=> {
     const id = req.body._id
     const password = req.body.password
-    console.log(password)
     // Find the user similar to the req id
     const result = await user.findOne({_id : id})
     if(result != null)
@@ -312,16 +332,19 @@ module.exports.login = async (req,res) => {
     const password = req.body.password
 
     const result = await user.findOne({ $or : [{username : UsernameOrEmail}, {email : UsernameOrEmail} ] })
-    console.log(result)
     if(result != null){
         const comparePassword = await bcrypt.compare(password, result.password)
         if(comparePassword){
             const accessToken = generateToken({ _id : result._id})
-            res.cookie('access_token', accessToken, { httpOnly: true, secure: true });
+            
             return res.status(200).json({ status: 'authenticated', accessToken });
+
+           
         }else {
             return res.status(401).json({ status: 'invalid username or password' });
         }
+
+        
         
     }else{
         return res.status(404).json({ status: 'account not found' });

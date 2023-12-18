@@ -5,7 +5,7 @@ const ServiceSchema = new mongoose.Schema({
             type : String
         },
         userId : {
-            type : String
+            type :  mongoose.Schema.Types.ObjectId
         }, 
         owner : {
             type :  mongoose.Schema.Types.ObjectId,
