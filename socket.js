@@ -65,10 +65,6 @@ io.on('connection', (socket)=>{
     
 })
 
-
-
-
-
-server.listen(5001, ()=>{
-    console.log("App listening at port: " + 5001 )
+server.listen(10000, ()=>{
+    console.log("App listening at port: " + 10000 )
 })
