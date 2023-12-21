@@ -151,17 +151,5 @@ module.exports.handleReadMessage = async (req,res) => {
 
     const chats = await messages.updateMany({conversationId : conversationId, readBy : { $nin : myId}}, { $push: { readBy: myId } })
 
-    // console.log(chats)
-
-    // try {
-    //     toRead.map(async(chat) => {
-    //        const messageId = chat._id
-    //        const test = await messages.updateOne({_id : messageId}, {$push : {readBy : myId}})
-           
-           
-    //     });
-    // } catch (error) {
-    //     return res.status(404).send({status : 'Failed'})
-    // }
     return res.json({message : 'success'})
 }

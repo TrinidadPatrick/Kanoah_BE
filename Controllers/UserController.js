@@ -4,17 +4,6 @@ const nodemailer = require('nodemailer')
 const cookieParser = require('cookie-parser');
 require("dotenv").config();
 const jwt = require('jsonwebtoken')
-const { StreamChat } = require('stream-chat');
-
-const apiKey = 'stvjq8j8spuj';
-const apiSecret = 'xqh6ydjxkgn7pqpzb484fd9ydc5jrsezrczcq7u9tz8hssyw5585t3mssjtat5xf';
-const appId = '1275878';
-
-// Initialize StreamChat
-const streamChat = StreamChat.getInstance(
-    "jbz7xh3ufm3p",
-    "2pdtnujsmwbtnjrxqrvrz9rujnqmpukssn5mnbefkxbyg4974tbx9gunpmy2jv9u"
-)
 
 const generateToken = (user) => {
     return jwt.sign({ _id : user._id }, process.env.SECRET_KEY, { expiresIn: '1day' });
@@ -52,7 +41,10 @@ module.exports.getUser = async (req, res) => {
     const getuserInfo = async (userId) => {
       try {
         const userInfo = await user.findOne({ _id: userId });
-        return res.json(userInfo);
+        const { password, ...userInfoWithoutPassword } = userInfo.toObject();
+
+         return res.json(userInfoWithoutPassword);
+        // return res.json(userInfo);
       } catch (error) {
         return error;
       }
