@@ -7,6 +7,7 @@ const messageSchema = new mongoose.Schema({
     readBy : [{ type: mongoose.Schema.Types.ObjectId, ref: 'User_Info' }],
     messageType : {type : String, required : true}, 
     createdAt : {type : Date, required : true},
+    deletedFor : [{ type: mongoose.Schema.Types.ObjectId}], 
     messageContent : 
     {
         sender : {type: mongoose.Schema.Types.ObjectId, ref: 'User_Info'},

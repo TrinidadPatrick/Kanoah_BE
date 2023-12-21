@@ -1,7 +1,7 @@
 
 const {Router} = require('express')
 const { getAllChats, sendChat, getUserChats, readChat, deleteConvo } = require('../Controllers/ChatController')
-const { fetchAllUsers, getReceiver, getServiceFromChat, sendMessage, retrieveContacts, getMessages, getAllMessages, handleReadMessage,  } = require('../Controllers/MessageController')
+const { fetchAllUsers, getReceiver, getServiceFromChat, sendMessage, retrieveContacts, getMessages, getAllMessages, handleReadMessage, viewChatMemberProfile, handleDeleteConversation,  } = require('../Controllers/MessageController')
 const { getServices, addService, getService, addGalleryImage, getGalleryImages, deleteImage, deleteMultipleImages, addFeaturedImage, getFeaturedImages, deleteFeaturedImage, deleteMultipleFeaturedImages, updateProfilePicture, getServiceInfo, getServiceProfile, updateService } = require('../Controllers/ServiceController')
 const router = Router()
 const {register, verifyEmail, verifyOTP, login, forgotPassword, newPassword, submitOtpForNewPassword, verifyUsername, getUsers, getUser, updateUser, verifyPassword, updatePassword, deactivateAccount, refresh, profile, handleFb, handleFbLogin, getUserInfo} = require('../Controllers/UserController')
@@ -67,5 +67,7 @@ router.get('/retrieveContacts/:_id', retrieveContacts)
 router.get('/getMessages/:conversationId/:returnLimit', getMessages)
 router.get('/getAllMessages/:_id', getAllMessages)
 router.put('/handleReadMessage', handleReadMessage)
+router.get('/viewChatMemberProfile/:_id', viewChatMemberProfile)
+router.delete('/handleDeleteConversation/:conversationId', handleDeleteConversation)
 
 module.exports = router;

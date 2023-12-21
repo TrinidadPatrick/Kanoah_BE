@@ -2,6 +2,7 @@ const Service = require('../Models/ServiceModel')
 const user = require('../Models/UserModel')
 const messages = require('../Models/MessageModel')
 const socketIO = require('socket.io');
+const jwt = require('jsonwebtoken')
 
 // Generate random ID
 function generateRandomId(length) {
@@ -70,7 +71,7 @@ module.exports.sendMessage = async (req,res) => {
     if(checkChatExisting != null)
     {
         try {
-            const result = await messages.create({conversationId : existingConversationId, participants,serviceInquired,readBy, createdAt,messageType,  messageContent})
+            const result = await messages.create({conversationId : existingConversationId, participants,serviceInquired,readBy, createdAt,messageType, deletedFor : [],  messageContent})
             return res.json({result})
         } catch (error) {
             return res.json({status : "failed", message : error})
@@ -80,7 +81,7 @@ module.exports.sendMessage = async (req,res) => {
     else
     {
         try {
-            const result = await messages.create({conversationId, participants,serviceInquired, readBy, createdAt,messageType, messageContent})
+            const result = await messages.create({conversationId, participants,serviceInquired, readBy, createdAt,messageType,deletedFor : [], messageContent})
             return res.json({result})
         } catch (error) {
             return res.json({status : "failed", message : error})
@@ -94,43 +95,75 @@ module.exports.sendMessage = async (req,res) => {
 // Get all contacts that the user communicated with
 module.exports.retrieveContacts = async (req,res) => {
     const {_id} = req.params
+    const token = req.headers.authorization?.split(' ')[1];
 
-    try {
-        const chatIds = await messages.distinct('conversationId', { participants : { $in: [_id]}})
-        const uniqueChats = new Set(chatIds);
-        const chats = await Promise.all([...uniqueChats].map(async (conversationId)=>{
-        const chat = await messages.findOne({ participants : _id, conversationId}).sort({ createdAt: -1 })
-        .populate('participants', 'username profileImage firstname lastname')
-        .populate('virtualServiceInquired', 'basicInformation serviceProfileImage')
-        return chat
-        }))
-        
-          return res.json(chats);
-    } catch (error) {
-        return res.status(404).send({status : "failed"})
+    const getContacts = async (user) => {
+        try {
+            const chatIds = await messages.distinct('conversationId', { participants : { $in: [_id]}, deletedFor: { $nin: [user._id] }})
+            const uniqueChats = new Set(chatIds)
+            const chats = await Promise.all([...uniqueChats].map(async (conversationId)=>{
+            const chat = await messages.findOne({ participants : _id, conversationId}).sort({ createdAt: -1 })
+            .populate('participants', 'username profileImage firstname lastname')
+            .populate('virtualServiceInquired', 'basicInformation serviceProfileImage')
+            return chat
+            }))
+            return res.json(chats);
+        } catch (error) {
+            return res.status(404).send({status : "failed"})
+        }
     }
+    
+
+    if (!token) {
+        return res.status(401).json({ error: 'Unauthorized' });
+      }
+    
+      jwt.verify(token, process.env.SECRET_KEY, (err, user) => {
+        if (err) {
+          return res.status(403).json({ error: 'Forbidden' });
+        }
+        getContacts(user)
+        
+      });
 }
 
 // Get specific chats
 module.exports.getMessages = async (req,res) => {
     const {conversationId} = req.params
     const {returnLimit} = req.params
-    try {
-        const documentCount = await messages.countDocuments({ conversationId: conversationId })
-        const messagesArray = await messages
-            .find({ conversationId: conversationId })
-            .skip(0)
-            .limit(returnLimit)
-            .sort({
-                'createdAt' : -1
-            }).populate('virtualServiceInquired', 'basicInformation serviceProfileImage').populate('participants', '_id')
-            .exec();
-            // console.log(documentCount)
-        const result = messagesArray.reverse()
-        return res.json({result, documentCount});
-    } catch (error) {
-        return res.status(404).send({status : "failed"})
-    }
+    const token = req.headers.authorization?.split(' ')[1];
+
+    const getMessage = async (user) => {
+        try {
+            const documentCount = await messages.countDocuments({ conversationId: conversationId, deletedFor: { $nin: [user._id] }})
+            const messagesArray = await messages
+                .find({ conversationId: conversationId, deletedFor: { $nin: [user._id] }})
+                .skip(0)
+                .limit(returnLimit)
+                .sort({
+                    'createdAt' : -1
+                }).populate('virtualServiceInquired', 'basicInformation serviceProfileImage').populate('participants', '_id')
+                .exec();
+                // console.log(documentCount)
+            const result = messagesArray.reverse()
+            return res.json({result, documentCount});
+        } catch (error) {
+            return res.status(404).send({status : "failed"})
+        }
+    }   
+    
+
+    if (!token) {
+        return res.status(401).json({ error: 'Unauthorized' });
+      }
+    
+      jwt.verify(token, process.env.SECRET_KEY, (err, user) => {
+        if (err) {
+          return res.status(403).json({ error: 'Forbidden' });
+        }
+        getMessage(user)
+        
+      });
 }
 
 // Get all chats related to user
@@ -152,4 +185,57 @@ module.exports.handleReadMessage = async (req,res) => {
     const chats = await messages.updateMany({conversationId : conversationId, readBy : { $nin : myId}}, { $push: { readBy: myId } })
 
     return res.json({message : 'success'})
+}
+
+module.exports.viewChatMemberProfile = async (req,res) =>{
+    const {_id} = req.params
+
+    try {
+        const profile = await user.findById(_id).select('firstname lastname Address email contact profileImage')
+        if(profile)
+        {
+            return res.json(profile)
+        }
+    } catch (error) {
+        return res.status(404).send({status : "failed"})
+    }
+}
+
+module.exports.handleDeleteConversation = async (req,res) => {
+    const {conversationId} = req.params
+    const token = req.headers.authorization?.split(' ')[1];
+
+    const deleteConversation = async (user) => {
+        const userId = user._id
+        const convos = await messages.find({conversationId})
+        
+        if(!convos)
+        {
+            return res.status(404).json({ message: 'Conversation not found' });
+        }
+
+        convos.forEach(async(message)=>{
+            if(!message.deletedFor.includes(userId))
+            {
+                message.deletedFor.push(userId);
+                await message.save();
+            }
+        })
+
+
+        res.json({ message: 'Conversation deleted for the user' });
+
+    }
+
+  if (!token) {
+    return res.status(401).json({ error: 'Unauthorized' });
+  }
+
+  jwt.verify(token, process.env.SECRET_KEY, (err, user) => {
+    if (err) {
+      return res.status(403).json({ error: 'Forbidden' });
+    }
+    deleteConversation(user)
+    
+  });
 }
