@@ -80,6 +80,17 @@ module.exports.sendMessage = async (req,res) => {
     // if conversation id is not existing, create a new document with a new conversation id
     else
     {
+        // Check if conversation is existing rom deleted conversation and use that conversation ID
+        const checkDeletedConvo = await messages.find({participants : { $in : participants}, serviceInquired})
+        if(checkDeletedConvo !== null)
+        {
+        try {
+            const result = await messages.create({conversationId : checkDeletedConvo[0].conversationId, participants,serviceInquired, readBy, createdAt,messageType,deletedFor : [], messageContent})
+            return res.json({result})
+        } catch (error) {
+            return res.json({status : "failed", message : error})
+        }
+        }
         try {
             const result = await messages.create({conversationId, participants,serviceInquired, readBy, createdAt,messageType,deletedFor : [], messageContent})
             return res.json({result})
@@ -142,7 +153,7 @@ module.exports.getMessages = async (req,res) => {
                 .limit(returnLimit)
                 .sort({
                     'createdAt' : -1
-                }).populate('virtualServiceInquired', 'basicInformation serviceProfileImage').populate('participants', '_id')
+                }).populate('virtualServiceInquired', 'basicInformation serviceProfileImage').populate('participants', '_id profileImage')
                 .exec();
                 // console.log(documentCount)
             const result = messagesArray.reverse()
@@ -171,7 +182,7 @@ module.exports.getAllMessages = async (req,res) => {
     const {_id} = req.params
 
     try {
-        const allChats = await messages.find({ participants : { $in: [_id]}})
+        const allChats = await messages.find({ participants : { $in: [_id]}}).populate('participants', 'profileImage')
         return res.json(allChats)
     } catch (error) {
         return res.status(404).send({status : "failed"})
