@@ -71,6 +71,7 @@ module.exports.sendMessage = async (req,res) => {
     if(checkChatExisting != null)
     {
         try {
+            console.log("Helo")
             const result = await messages.create({conversationId : existingConversationId, participants,serviceInquired,readBy, createdAt,messageType, deletedFor : [],  messageContent})
             return res.json({result})
         } catch (error) {
