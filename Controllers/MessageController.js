@@ -71,7 +71,6 @@ module.exports.sendMessage = async (req,res) => {
     if(checkChatExisting != null)
     {
         try {
-            console.log("Helo")
             const result = await messages.create({conversationId : existingConversationId, participants,serviceInquired,readBy, createdAt,messageType, deletedFor : [],  messageContent})
             return res.json({result})
         } catch (error) {
@@ -83,7 +82,7 @@ module.exports.sendMessage = async (req,res) => {
     {
         // Check if conversation is existing rom deleted conversation and use that conversation ID
         const checkDeletedConvo = await messages.find({participants : { $in : participants}, serviceInquired})
-        if(checkDeletedConvo !== null)
+        if(checkDeletedConvo.length !== 0)
         {
         try {
             const result = await messages.create({conversationId : checkDeletedConvo[0].conversationId, participants,serviceInquired, readBy, createdAt,messageType,deletedFor : [], messageContent})
@@ -93,6 +92,7 @@ module.exports.sendMessage = async (req,res) => {
         }
         }
         try {
+            
             const result = await messages.create({conversationId, participants,serviceInquired, readBy, createdAt,messageType,deletedFor : [], messageContent})
             return res.json({result})
         } catch (error) {
