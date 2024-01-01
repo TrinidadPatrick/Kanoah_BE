@@ -20,7 +20,7 @@ const io = new Server(server, {
 });
 app.use(cors({
     credentials: true,
-    origin: 'http://localhost:3000'
+    origin: ['http://localhost:3000', 'https://web-based-service-finder.vercel.app']
 }))
 app.use(cookieParser())
 app.use(express.json())

@@ -17,6 +17,10 @@ const ServiceSchema = new mongoose.Schema({
         advanceInformation : {
             type : Object
         },
+        acceptBooking : {
+            type : Boolean,
+            default : false
+        },
         address : {
             type : Object
         },
