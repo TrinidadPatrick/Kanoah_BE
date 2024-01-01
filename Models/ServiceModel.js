@@ -36,6 +36,10 @@ const ServiceSchema = new mongoose.Schema({
             type : String,
             default : null
         },
+        serviceOffers : {
+            type : Array,
+            default : []
+        },
         ratings: {
             type: Array,
             default: [

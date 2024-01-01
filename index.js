@@ -1,10 +1,12 @@
 const express = require('express')
 const mongoose = require('mongoose')
 const cors = require('cors')
+const cookieParser = require('cookie-parser')
 
 const Route = require('./Routes/Routes')
 const http = require('http')
 const {Server} = require('socket.io')
+
 
 // const tempServiceRoute = require('./Routes/ServiceRoute')
 const app = express()
@@ -13,12 +15,16 @@ const io = new Server(server, {
     cors: {
         origin: ["http://localhost:5001", "http://localhost:3000", 'https://web-based-service-finder.vercel.app'],
         methods: ['GET', 'POST'],
+        credentials: true,
     },
 });
-
-
+app.use(cors({
+    credentials: true,
+    origin: 'http://localhost:3000'
+}))
+app.use(cookieParser())
 app.use(express.json())
-app.use(cors())
+
 require("dotenv").config();
 
 mongoose.connect(process.env.MONGO_URI)
@@ -68,4 +74,5 @@ io.on('connection', (socket) => {
 
 server.listen(process.env.PORT, ()=>{
     console.log("App listening at port: " + process.env.PORT )
+    
 })

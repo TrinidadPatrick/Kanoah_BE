@@ -316,4 +316,9 @@ module.exports.updateService = async (req,res)=>{
       }
 
 }
+
+// Adds  serviceOffer
+// module.exports.addServiceOffers = async (req,res) => {
+
+// }
     

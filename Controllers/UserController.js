@@ -42,7 +42,6 @@ module.exports.getUser = async (req, res) => {
       try {
         const userInfo = await user.findOne({ _id: userId });
         const { password, ...userInfoWithoutPassword } = userInfo.toObject();
-
          return res.json(userInfoWithoutPassword);
         // return res.json(userInfo);
       } catch (error) {
@@ -52,7 +51,6 @@ module.exports.getUser = async (req, res) => {
   
     const token = req.headers.authorization?.split(' ')[1];
 
-  
     if (!token) {
       return res.status(401).json({ error: 'Unauthorized' });
     }
@@ -63,6 +61,7 @@ module.exports.getUser = async (req, res) => {
         {
             return res.status(403).json({ error: 'Forbidden' });
         }
+        
         getuserInfo(user._id);
       });
     } catch (err) {
@@ -328,16 +327,14 @@ module.exports.login = async (req,res) => {
         const comparePassword = await bcrypt.compare(password, result.password)
         if(comparePassword){
             const accessToken = generateToken({ _id : result._id})
-            
+            res.cookie('accessToken', accessToken, { httpOnly: true, sameSite: 'None' })
             return res.status(200).json({ status: 'authenticated', accessToken });
 
            
         }else {
             return res.status(401).json({ status: 'invalid username or password' });
         }
-
-        
-        
+   
     }else{
         return res.status(404).json({ status: 'account not found' });
     }
