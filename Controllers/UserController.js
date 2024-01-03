@@ -9,20 +9,18 @@ const generateToken = (user) => {
     return jwt.sign({ _id : user._id }, process.env.SECRET_KEY, { expiresIn: '1day' });
 }
 
-const generateRefreshToken = (user) => {
-    return jwt.sign({ _id : user._id }, process.env.REFRESH_SECRET_KEY);
-}
+
 
 // Get All Users
 module.exports.getUsers = async (req,res) =>{
-    const token = req.headers.authorization?.split(' ')[1];
+    const accessToken = req.cookies.accessToken
     const users = await user.find()
 
-    if (!token) {
+    if (!accessToken) {
         return res.status(401).json({ error: 'Unauthorized' });
       }
     
-      jwt.verify(token, process.env.SECRET_KEY, (err, user) => {
+      jwt.verify(accessToken, process.env.SECRET_KEY, (err, user) => {
         if (err) {
           return res.status(403).json({ error: 'Forbidden' });
         }
@@ -38,25 +36,25 @@ module.exports.getUsers = async (req,res) =>{
 
 // Get specific User
 module.exports.getUser = async (req, res) => {
+    const accessToken = req.cookies.accessToken
     const getuserInfo = async (userId) => {
       try {
         const userInfo = await user.findOne({ _id: userId });
         const { password, ...userInfoWithoutPassword } = userInfo.toObject();
          return res.json(userInfoWithoutPassword);
-        // return res.json(userInfo);
       } catch (error) {
         return error;
       }
     };
   
-    const token = req.headers.authorization?.split(' ')[1];
+    // const token = req.headers.authorization?.split(' ')[1];
 
-    if (!token) {
+    if (!accessToken) {
       return res.status(401).json({ error: 'Unauthorized' });
     }
   
     try {
-      jwt.verify(token, process.env.SECRET_KEY, (err, user)=>{
+      jwt.verify(accessToken, process.env.SECRET_KEY, (err, user)=>{
         if(err)
         {
             return res.status(403).json({ error: 'Forbidden' });
@@ -99,32 +97,62 @@ module.exports.verifyPassword = async (req,res)=>{
 
 // Update user information
 module.exports.updateUser = async (req,res) =>{
-    const _id = req.params._id
     const data = req.body
-    try {
-        // Find duplicates except for the active users information
-        const verifyUsername= await user.findOne({username : req.body.username, _id : {$ne : _id}})
-        const verifyEmail = await user.findOne({email : req.body.email, _id : {$ne : _id}})
-        const verifyContact = await user.findOne({contact : req.body.contact, _id : {$ne : _id}})
-        if(verifyUsername){return res.json({status: "usernameDuplicate"})}
-        if(verifyEmail){return res.json({status: "emailDuplicate"})}
-        if(verifyContact){return res.json({status: "contactDuplicate"})}
-        else{
-            const result = await user.findByIdAndUpdate(_id, data, {
-                new: true,
-                runValidators: true
-            })
-            return res.json({data: result, status: "updated" });
-        }
-        
-    if (!result) {
-        return res.status(404).json({ message: 'Document not found' });
-        }
-      
+    const accessToken = req.cookies.accessToken
+    const _id = req.params._id
+
+    const updateUserInfo = async (userId) => {
+        if(userId === _id)
+        {
+ try {
+            // Find duplicates except for the active users information
+            const verifyUsername= await user.findOne({username : req.body.username, _id : {$ne : _id}})
+            const verifyEmail = await user.findOne({email : req.body.email, _id : {$ne : _id}})
+            const verifyContact = await user.findOne({contact : req.body.contact, _id : {$ne : _id}})
+            if(verifyUsername){return res.json({status: "usernameDuplicate"})}
+            if(verifyEmail){return res.json({status: "emailDuplicate"})}
+            if(verifyContact){return res.json({status: "contactDuplicate"})}
+            else{
+                const result = await user.findByIdAndUpdate(_id, data, {
+                    new: true,
+                    runValidators: true
+                })
+                return res.json({data: result, status: "updated" });
+            }
     
-    } catch (error) {
-        return res.status(500).json({ message: 'Internal server error', error: error.message });
+          
+        
+        } catch (error) {
+            return res.status(500).json({ message: 'Internal server error', error: error.message });
+        }
+        }
+       
     }
+
+    if (!accessToken) {
+        return res.status(401).json({ error: 'Unauthorized' });
+      }
+    
+      try {
+        jwt.verify(accessToken, process.env.SECRET_KEY, (err, user)=>{
+          if(err)
+          {
+              return res.status(403).json({ error: 'Forbidden' });
+          }
+          
+          updateUserInfo(user._id)
+        });
+      } catch (err) {
+          
+        if (err.name === 'TokenExpiredError') {
+          return res.status(401).json({ error: 'Token expired' });
+        } else {
+          return res.status(403).json({ error: 'Forbidden' });
+        }
+      }
+
+    
+    
 }
 
 // CHECK USERNAME AVAILABILITY
@@ -319,6 +347,7 @@ module.exports.verifyOTP = async (req,res) => {
 
 // Login in
 module.exports.login = async (req,res) => {
+
     const UsernameOrEmail = req.body.UsernameOrEmail
     const password = req.body.password
 
@@ -327,8 +356,9 @@ module.exports.login = async (req,res) => {
         const comparePassword = await bcrypt.compare(password, result.password)
         if(comparePassword){
             const accessToken = generateToken({ _id : result._id})
-            res.cookie('accessToken', accessToken, { httpOnly: true, sameSite: 'None' })
-            return res.status(200).json({ status: 'authenticated', accessToken });
+            res.cookie('accessToken', accessToken, {secure: true , httpOnly: true , sameSite: 'None',  expires: new Date(Date.now() + 3600000)  });           
+            return res.send({ status: 'authenticated', accessToken })
+            // return res.status(200).send({ status: 'authenticated', accessToken });
 
            
         }else {
@@ -346,6 +376,7 @@ module.exports.login = async (req,res) => {
 
 // For profile authentication to get profile
 module.exports.profile =  (req,res) => {
+    
     const token = req.headers.authorization?.split(' ')[1];
 
   if (!token) {
@@ -356,7 +387,7 @@ module.exports.profile =  (req,res) => {
     if (err) {
       return res.status(403).json({ error: 'Forbidden' });
     }
-
+    
     res.json({status : "logged in", user });
   });
 }

@@ -7,6 +7,7 @@ require("dotenv").config();
 
 // Get All Services
 module.exports.getServices = async (req,res) =>{
+    
     const services = await Service.find().populate('owner', 'firstname lastname profileImage')
     return res.json({service : services});
 }
@@ -41,7 +42,7 @@ module.exports.getService = async (req,res) => {
             const result = await Service.findOne({userId}).populate('owner', 'firstname lastname')
             return res.json({result})
         } catch (error) {
-            return res.json({status : "failed", message : err})
+            return res.json({status : "failed", message : error})
         }
         
     

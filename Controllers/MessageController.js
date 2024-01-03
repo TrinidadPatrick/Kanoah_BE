@@ -19,6 +19,7 @@ function generateRandomId(length) {
 
 //Get all Users except the current user
 module.exports.fetchAllUsers = async (req,res) => {
+    
     const {_id} = req.params
 
     try {
@@ -180,6 +181,7 @@ module.exports.getMessages = async (req,res) => {
 
 // Get all chats related to user
 module.exports.getAllMessages = async (req,res) => {
+    
     const {_id} = req.params
 
     try {
