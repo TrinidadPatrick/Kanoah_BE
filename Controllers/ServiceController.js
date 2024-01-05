@@ -10,6 +10,8 @@ module.exports.getServices = async (req,res) =>{
     
     const services = await Service.find().populate('owner', 'firstname lastname profileImage')
     return res.json({service : services});
+
+    
 }
 
 // add Service
@@ -37,13 +39,43 @@ module.exports.addService = async (req,res) => {
 
 // Get Service for profile
 module.exports.getService = async (req,res) => {
-    const {userId} = req.params
-        try {
-            const result = await Service.findOne({userId}).populate('owner', 'firstname lastname')
-            return res.json({result})
-        } catch (error) {
-            return res.json({status : "failed", message : error})
+        const {userId} = req.params
+
+        const getService = async (_id) => {
+            if(userId === _id)
+            {
+                try {
+                    const result = await Service.findOne({userId}).populate('owner', 'firstname lastname')
+                    return res.json({result})
+                } catch (error) {
+                    return res.json({status : "failed", message : error})
+                }
+            }
         }
+        
+
+        const accessToken = req.cookies.accessToken
+        if (!accessToken) {
+            return res.status(401).json({ error: 'Unauthorized' });
+          }
+        
+          try {
+            jwt.verify(accessToken, process.env.SECRET_KEY, (err, user)=>{
+              if(err)
+              {
+                  return res.status(403).json({ error: 'Forbidden' });
+              }
+              
+              getService(user._id);
+            });
+          } catch (err) {
+              
+            if (err.name === 'TokenExpiredError') {
+              return res.status(401).json({ error: 'Token expired' });
+            } else {
+              return res.status(403).json({ error: 'Forbidden' });
+            }
+          }
         
     
 }
@@ -100,22 +132,51 @@ module.exports.deleteImage = async (req,res) => {
     const imageId = req.body.imageId
     const userId = req.body.userId
 
-    try {
-        const service = await Service.findOne({userId})
-
-        if(!service)
+    const deleteImage = async (_id) => {
+        if(userId === _id)
         {
-            return res.json({ success: false, message: 'Service not found' });
+            try {
+                const service = await Service.findOne({userId})
+        
+                if(!service)
+                {
+                    return res.json({ success: false, message: 'Service not found' });
+                }
+        
+                const index = service.galleryImages.findIndex(image => image.imageId == imageId)
+                const deleted = service.galleryImages.splice(index, 1)
+                await service.save()
+        
+                return res.json({success : true})
+            } catch (error) {
+                return res.json({message : error})
+            }
         }
-
-        const index = service.galleryImages.findIndex(image => image.imageId == imageId)
-        const deleted = service.galleryImages.splice(index, 1)
-        await service.save()
-
-        return res.json({success : true})
-    } catch (error) {
-        return res.json({message : error})
     }
+    
+
+    const accessToken = req.cookies.accessToken
+        if (!accessToken) {
+            return res.status(401).json({ error: 'Unauthorized' });
+          }
+        
+          try {
+            jwt.verify(accessToken, process.env.SECRET_KEY, (err, user)=>{
+              if(err)
+              {
+                  return res.status(403).json({ error: 'Forbidden' });
+              }
+              
+              deleteImage(user._id);
+            });
+          } catch (err) {
+              
+            if (err.name === 'TokenExpiredError') {
+              return res.status(401).json({ error: 'Token expired' });
+            } else {
+              return res.status(403).json({ error: 'Forbidden' });
+            }
+          }
 }
 
 // Delete multiple images from galler
@@ -123,23 +184,52 @@ module.exports.deleteMultipleImages = async (req, res) => {
   const userId = req.body.userId;
   const imagesToDelete = req.body.imagesToDelete;
 
-  try {
-    const service = await Service.findOne({ userId });
-
-    if (!service) {
-      return res.json({ success: false, message: 'Service not found' });
+  const deleteMultiple = async (_id) => {
+    if(userId === _id)
+    {
+        try {
+            const service = await Service.findOne({ userId });
+        
+            if (!service) {
+              return res.json({ success: false, message: 'Service not found' });
+            }
+        
+            // Filter images to keep only those not in imagesToDelete
+            service.galleryImages = service.galleryImages.filter((image) => !imagesToDelete.includes(image.imageId));
+        
+            // Save the updated service
+            await service.save();
+        
+            return res.json({ success: true });
+          } catch (error) {
+            return res.json({ success: false, message: error.message });
+          }
     }
-
-    // Filter images to keep only those not in imagesToDelete
-    service.galleryImages = service.galleryImages.filter((image) => !imagesToDelete.includes(image.imageId));
-
-    // Save the updated service
-    await service.save();
-
-    return res.json({ success: true });
-  } catch (error) {
-    return res.json({ success: false, message: error.message });
   }
+  
+
+  const accessToken = req.cookies.accessToken
+  if (!accessToken) {
+      return res.status(401).json({ error: 'Unauthorized' });
+    }
+  
+    try {
+      jwt.verify(accessToken, process.env.SECRET_KEY, (err, user)=>{
+        if(err)
+        {
+            return res.status(403).json({ error: 'Forbidden' });
+        }
+        
+        deleteMultiple(user._id);
+      });
+    } catch (err) {
+        
+      if (err.name === 'TokenExpiredError') {
+        return res.status(401).json({ error: 'Token expired' });
+      } else {
+        return res.status(403).json({ error: 'Forbidden' });
+      }
+    }
 };
 
 // Update or Add Featured Images
@@ -178,46 +268,106 @@ module.exports.deleteFeaturedImage = async (req,res) => {
     const imageId = req.body.imageId
     const userId = req.body.userId
 
-    try {
-        const service = await Service.findOne({userId})
-
-        if(!service)
+    const deleteImage = async (_id) => {
+        if(userId === _id)
         {
-            return res.json({ success: false, message: 'Service not found' });
+            try {
+                const service = await Service.findOne({userId})
+        
+                if(!service)
+                {
+                    return res.json({ success: false, message: 'Service not found' });
+                }
+        
+                const index = service.featuredImages.findIndex(image => image.imageId == imageId)
+                const deleted = service.featuredImages.splice(index, 1)
+                await service.save()
+        
+                return res.json({success : true})
+            } catch (error) {
+                return res.json({message : error})
+            }
         }
-
-        const index = service.featuredImages.findIndex(image => image.imageId == imageId)
-        const deleted = service.featuredImages.splice(index, 1)
-        await service.save()
-
-        return res.json({success : true})
-    } catch (error) {
-        return res.json({message : error})
     }
+   
+
+    const accessToken = req.cookies.accessToken
+        if (!accessToken) {
+            return res.status(401).json({ error: 'Unauthorized' });
+          }
+        
+          try {
+            jwt.verify(accessToken, process.env.SECRET_KEY, (err, user)=>{
+              if(err)
+              {
+                  return res.status(403).json({ error: 'Forbidden' });
+              }
+              
+              deleteImage(user._id);
+            });
+          } catch (err) {
+              
+            if (err.name === 'TokenExpiredError') {
+              return res.status(401).json({ error: 'Token expired' });
+            } else {
+              return res.status(403).json({ error: 'Forbidden' });
+            }
+          }
+
+    
 }
 
-// Delete multiple images from galler
+// Delete multiple images from features images
 module.exports.deleteMultipleFeaturedImages = async (req, res) => {
     const userId = req.body.userId;
     const imagesToDelete = req.body.imagesToDelete;
-  
-    try {
-      const service = await Service.findOne({ userId });
-  
-      if (!service) {
-        return res.json({ success: false, message: 'Service not found' });
-      }
-  
-      // Filter images to keep only those not in imagesToDelete
-      service.featuredImages = service.featuredImages.filter((image) => !imagesToDelete.includes(image.imageId));
-  
-      // Save the updated service
-      await service.save();
-  
-      return res.json({ success: true });
-    } catch (error) {
-      return res.json({ success: false, message: error.message });
+    
+    const deleteMultiple = async (_id) => {
+        if(userId === _id)
+        {
+            try {
+                const service = await Service.findOne({ userId });
+            
+                if (!service) {
+                  return res.json({ success: false, message: 'Service not found' });
+                }
+            
+                // Filter images to keep only those not in imagesToDelete
+                service.featuredImages = service.featuredImages.filter((image) => !imagesToDelete.includes(image.imageId));
+            
+                // Save the updated service
+                await service.save();
+            
+                return res.json({ success: true });
+              } catch (error) {
+                return res.json({ success: false, message: error.message });
+              }
+        }
     }
+    
+
+    const accessToken = req.cookies.accessToken
+        if (!accessToken) {
+            return res.status(401).json({ error: 'Unauthorized' });
+          }
+        
+          try {
+            jwt.verify(accessToken, process.env.SECRET_KEY, (err, user)=>{
+              if(err)
+              {
+                  return res.status(403).json({ error: 'Forbidden' });
+              }
+              
+              deleteMultiple(user._id);
+            });
+          } catch (err) {
+              
+            if (err.name === 'TokenExpiredError') {
+              return res.status(401).json({ error: 'Token expired' });
+            } else {
+              return res.status(403).json({ error: 'Forbidden' });
+            }
+          }
   };
 
 // Update service Profile Picture
@@ -275,31 +425,37 @@ module.exports.getServiceProfile = async (req,res) => {
 // Update the service information
 module.exports.updateService = async (req,res)=>{
     const {userId} = req.params
-    const token = req.headers.authorization?.split(' ')[1];
+    const accessToken = req.cookies.accessToken
+
     const updateData = req.body
     // Updates the service
-    const updateService = async (userId) => {
-        try {
-            const updated = await Service.findOneAndUpdate(
-                {userId : userId},
-                {$set : updateData}
-            )
-            return res.json({status : "Success"})
-        } catch (error) {
-            return res.status(404).json({error : error})
+    const updateService = async (_id) => {
+        if(userId === _id)
+        {
+            try {
+                const updated = await Service.findOneAndUpdate(
+                    {userId : userId},
+                    {$set : updateData}
+                )
+                return res.json({status : "Success"})
+            } catch (error) {
+                return res.status(404).json({error : error})
+            }
         }
+        
     }
 
-    if (!token) {
+    if (!accessToken) {
         return res.status(401).json({ error: 'Unauthorized' });
       }
     
       try {
-        jwt.verify(token, process.env.SECRET_KEY, (err, user)=>{
+        jwt.verify(accessToken, process.env.SECRET_KEY, (err, user)=>{
           if(err)
           {
-                    
+             
               return res.status(403).json({ errors: 'Forbidden' });
+
           }
           if(user._id === userId)
           {
@@ -307,7 +463,7 @@ module.exports.updateService = async (req,res)=>{
           }
         });
       } catch (err) {
-
+         
         if (err.name === 'TokenExpiredError') {
           return res.status(401).json({ error: 'Token expired' });
         } else {

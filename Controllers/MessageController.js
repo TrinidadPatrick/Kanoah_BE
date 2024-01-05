@@ -108,7 +108,7 @@ module.exports.sendMessage = async (req,res) => {
 // Get all contacts that the user communicated with
 module.exports.retrieveContacts = async (req,res) => {
     const {_id} = req.params
-    const token = req.headers.authorization?.split(' ')[1];
+    const accessToken = req.cookies.accessToken
 
     const getContacts = async (user) => {
         try {
@@ -127,11 +127,11 @@ module.exports.retrieveContacts = async (req,res) => {
     }
     
 
-    if (!token) {
+    if (!accessToken) {
         return res.status(401).json({ error: 'Unauthorized' });
       }
     
-      jwt.verify(token, process.env.SECRET_KEY, (err, user) => {
+      jwt.verify(accessToken, process.env.SECRET_KEY, (err, user) => {
         if (err) {
           return res.status(403).json({ error: 'Forbidden' });
         }
@@ -144,6 +144,7 @@ module.exports.retrieveContacts = async (req,res) => {
 module.exports.getMessages = async (req,res) => {
     const {conversationId} = req.params
     const {returnLimit} = req.params
+    const accessToken = req.cookies.accessToken
     const token = req.headers.authorization?.split(' ')[1];
 
     const getMessage = async (user) => {
@@ -166,11 +167,11 @@ module.exports.getMessages = async (req,res) => {
     }   
     
 
-    if (!token) {
+    if (!accessToken) {
         return res.status(401).json({ error: 'Unauthorized' });
       }
     
-      jwt.verify(token, process.env.SECRET_KEY, (err, user) => {
+      jwt.verify(accessToken, process.env.SECRET_KEY, (err, user) => {
         if (err) {
           return res.status(403).json({ error: 'Forbidden' });
         }
@@ -217,7 +218,7 @@ module.exports.viewChatMemberProfile = async (req,res) =>{
 
 module.exports.handleDeleteConversation = async (req,res) => {
     const {conversationId} = req.params
-    const token = req.headers.authorization?.split(' ')[1];
+    const accessToken = req.cookies.accessToken
 
     const deleteConversation = async (user) => {
         const userId = user._id
@@ -241,11 +242,11 @@ module.exports.handleDeleteConversation = async (req,res) => {
 
     }
 
-  if (!token) {
+  if (!accessToken) {
     return res.status(401).json({ error: 'Unauthorized' });
   }
 
-  jwt.verify(token, process.env.SECRET_KEY, (err, user) => {
+  jwt.verify(accessToken, process.env.SECRET_KEY, (err, user) => {
     if (err) {
       return res.status(403).json({ error: 'Forbidden' });
     }
