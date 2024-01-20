@@ -45,10 +45,15 @@ const userSchema = new mongoose.Schema({
     },
     Address : {
         type : Object,
+        default : null
     },
     Status : {
         type : String,
         default : "Active"
+    },
+    Role : {
+        type : String,
+        default : "User"
     }
 })
 

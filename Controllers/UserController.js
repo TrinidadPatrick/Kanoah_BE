@@ -6,7 +6,7 @@ require("dotenv").config();
 const jwt = require('jsonwebtoken')
 
 const generateToken = (user) => {
-    return jwt.sign({ _id : user._id }, process.env.SECRET_KEY, { expiresIn: '1day' });
+    return jwt.sign({ _id : user._id }, process.env.SECRET_KEY, { expiresIn: '5day' });
 }
 
 
@@ -190,19 +190,6 @@ module.exports.register = async (req,res) => {
             const refreshToken = generateRefreshToken({username : username, email : email, _id : response._id})
             const id = response._id
 
-            
-
-            const forStreamChat = async () => {
-                const exisitingUsers = await streamChat.queryUsers({id})
-                if(exisitingUsers.length > 0)
-                {
-                    return  status(400).send("User ID is taken")
-                }
-                await streamChat.upsertUser({name : username, id})
-            }
-
-            forStreamChat()
-
             res.json({message : "Registration completed Successfully" , status : "registered", accessToken : accessToken, refreshToken : refreshToken})
         }).catch((err)=>{
             res.send(err)
@@ -356,7 +343,7 @@ module.exports.login = async (req,res) => {
         const comparePassword = await bcrypt.compare(password, result.password)
         if(comparePassword){
             const accessToken = generateToken({ _id : result._id})
-            res.cookie('accessToken', accessToken, {secure: true , httpOnly: true , sameSite: 'None',  expires: new Date(Date.now() + 3600000)  });           
+            res.cookie('accessToken', accessToken, {secure: true , httpOnly: true , sameSite: 'None',  expires: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000)  });           
             return res.send({ status: 'authenticated', accessToken })
             // return res.status(200).send({ status: 'authenticated', accessToken });
 
@@ -470,5 +457,10 @@ module.exports.newPassword = async (req,res) => {
     }else {
         res.json({status : "failed"})
     }
+}
+
+module.exports.userLogout = async (req,res) => {
+    res.clearCookie('accessToken', { httpOnly: true });
+    return res.status(200).send({message : 'success'})
 }
 

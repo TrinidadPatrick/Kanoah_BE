@@ -1,10 +1,13 @@
 
 const {Router} = require('express')
+const { loginasAdmin, addAdmin, logout, checkStatus, getAdminInfo, getAdmins, refreshAdmin, addCategory, getCategories, updateCategories } = require('../Controllers/AdminController')
+const { addBooking, getBooking, respondBooking, getBookingSchedules, getPendingBooking, getAcceptedBooking, getRejectedBooking, getBookingHistory } = require('../Controllers/BookingsController')
 const { getAllChats, sendChat, getUserChats, readChat, deleteConvo } = require('../Controllers/ChatController')
 const { fetchAllUsers, getReceiver, getServiceFromChat, sendMessage, retrieveContacts, getMessages, getAllMessages, handleReadMessage, viewChatMemberProfile, handleDeleteConversation,  } = require('../Controllers/MessageController')
+const { payment } = require('../Controllers/PaymentController')
 const { getServices, addService, getService, addGalleryImage, getGalleryImages, deleteImage, deleteMultipleImages, addFeaturedImage, getFeaturedImages, deleteFeaturedImage, deleteMultipleFeaturedImages, updateProfilePicture, getServiceInfo, getServiceProfile, updateService } = require('../Controllers/ServiceController')
 const router = Router()
-const {register, verifyEmail, verifyOTP, login, forgotPassword, newPassword, submitOtpForNewPassword, verifyUsername, getUsers, getUser, updateUser, verifyPassword, updatePassword, deactivateAccount, refresh, profile, handleFb, handleFbLogin, getUserInfo} = require('../Controllers/UserController')
+const {register, verifyEmail, verifyOTP, login, forgotPassword, newPassword, submitOtpForNewPassword, verifyUsername, getUsers, getUser, updateUser, verifyPassword, updatePassword, deactivateAccount, refresh, profile, handleFb, handleFbLogin, getUserInfo, userLogout} = require('../Controllers/UserController')
 
 // User Routes
 router.post("/register", register)
@@ -22,6 +25,7 @@ router.patch("/deactivateAccount", deactivateAccount)
 router.put("/updateUser/:_id", updateUser)
 router.get("/getUsers", getUsers)
 router.get("/getUser", getUser)
+router.get("/userLogout", userLogout)
 
 
 //  Service Route
@@ -69,6 +73,28 @@ router.get('/getAllMessages/:_id', getAllMessages)
 router.put('/handleReadMessage', handleReadMessage)
 router.get('/viewChatMemberProfile/:_id', viewChatMemberProfile)
 router.delete('/handleDeleteConversation/:conversationId', handleDeleteConversation)
+
+// admin Route
+router.post('/loginasAdmin', loginasAdmin)
+router.post('/addAdmin', addAdmin)
+router.get('/logout', logout)
+router.get('/checkStatus', checkStatus)
+router.get('/refreshAdmin', refreshAdmin)
+router.get('/getAdminInfo', getAdminInfo)
+router.get('/getAdmins', getAdmins)
+router.post('/addCategory', addCategory)
+router.get('/getCategories', getCategories)
+router.put('/updateCategories', updateCategories)
+
+// Booking Route
+router.get('/getBookingSchedules/:shop_id', getBookingSchedules)
+router.post('/addBooking', addBooking)
+router.get('/getBooking', getBooking)
+router.get('/getAcceptedBooking/:_id', getAcceptedBooking)
+router.get('/getRejectedBooking/:_id', getRejectedBooking)
+router.get('/getBookingHistory/:_id', getBookingHistory)
+router.get('/getPendingBooking/:_id', getPendingBooking)
+router.patch('/respondBooking/:_id', respondBooking)
 
 
 module.exports = router;

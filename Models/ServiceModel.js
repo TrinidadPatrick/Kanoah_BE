@@ -1,5 +1,6 @@
 const mongoose = require('mongoose')
 
+
 const ServiceSchema = new mongoose.Schema({
         createdAt : {
             type : String
@@ -12,10 +13,21 @@ const ServiceSchema = new mongoose.Schema({
             ref: "User_Info"
         },
         basicInformation : {
-            type : Object
+            type : Object,
+            
         }, 
         advanceInformation : {
-            type : Object
+            type : Object,
+            ref : 'Categories',
+            ServiceCategory : {
+                type: mongoose.Schema.Types.ObjectId,
+                ref : 'Categories'
+            },
+            ServiceSubCategory : {
+                type: mongoose.Schema.Types.ObjectId,
+                default : "",
+                ref : 'Categories'
+            }
         },
         acceptBooking : {
             type : Boolean,

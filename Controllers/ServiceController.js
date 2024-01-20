@@ -1,14 +1,37 @@
 const Service = require('../Models/ServiceModel')
 const user = require('../Models/UserModel')
-const bcrypt = require('bcrypt')
-const nodemailer = require('nodemailer')
+const category = require("../Models/CategoryModel")
 const jwt = require('jsonwebtoken')
 require("dotenv").config();
 
 // Get All Services
 module.exports.getServices = async (req,res) =>{
     
-    const services = await Service.find().populate('owner', 'firstname lastname profileImage')
+  const services = await Service.find()
+  .populate('owner', 'firstname lastname profileImage')
+  .populate('advanceInformation.ServiceCategory', 'name category_code parent_code')
+  .populate({
+    path: 'advanceInformation.ServiceSubCategory',
+    select: 'name subCategory_code parent_code',
+    options: { skipInvalidIds: true } // Skip invalid IDs (e.g., null or non-existent)
+});
+    return res.json({service : services});
+
+    
+}
+
+
+// Get Booking History for owner
+module.exports.getOwnerBookingHistoryServices = async (req,res) =>{
+    
+  const services = await Service.find({$or : [{status : "DONE"}, {status : "CANCELLED"}, {status : {$ne : "DELETED"}}]})
+  .populate('owner', 'firstname lastname profileImage')
+  .populate('advanceInformation.ServiceCategory', 'name category_code parent_code')
+  .populate({
+    path: 'advanceInformation.ServiceSubCategory',
+    select: 'name subCategory_code parent_code',
+    options: { skipInvalidIds: true } // Skip invalid IDs (e.g., null or non-existent)
+});
     return res.json({service : services});
 
     
@@ -389,14 +412,22 @@ module.exports.updateProfilePicture = async (req,res) => {
 module.exports.getServiceProfile = async (req,res) => {
     const getServiceInfo = async (id) => {
         try {
-          const serviceInfo = await Service.findOne({ userId: id });
+          const serviceInfo = await Service.findOne({ userId: id })
+          .populate('advanceInformation.ServiceCategory', 'name category_code parent_code');
+        
+        if (serviceInfo && serviceInfo.advanceInformation && serviceInfo.advanceInformation.ServiceSubCategory !== "") {
+          // Populate ServiceSubCategory only if it is not an empty string
+          await serviceInfo.populate('advanceInformation.ServiceSubCategory', 'name subCategory_code parent_code');
+        }
+        
+
           return res.json(serviceInfo);
         } catch (error) {
           return error;
         }
       };
     
-      const token = req.headers.authorization?.split(' ')[1];
+      const token = req.cookies.accessToken
   
     
       if (!token) {
