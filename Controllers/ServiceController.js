@@ -14,7 +14,7 @@ module.exports.getServices = async (req,res) =>{
     path: 'advanceInformation.ServiceSubCategory',
     select: 'name subCategory_code parent_code',
     options: { skipInvalidIds: true } // Skip invalid IDs (e.g., null or non-existent)
-});
+}).select("advanceInformation basicInformation ratings serviceProfileImage tags userId createdAt owner address")
     return res.json({service : services});
 
     
@@ -455,6 +455,7 @@ module.exports.getServiceProfile = async (req,res) => {
 
 // Update the service information
 module.exports.updateService = async (req,res)=>{
+    
     const {userId} = req.params
     const accessToken = req.cookies.accessToken
 

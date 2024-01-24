@@ -33,12 +33,13 @@ module.exports.addBooking = async (req,res) => {
     }
 }
 
-// get bookings for specific user
-module.exports.getBooking = async (req,res) => {
+// get pending bookings for specific user
+module.exports.CLIENT_getPendingBooking = async (req,res) => {
     const accessToken = req.cookies.accessToken
     const getBookingInfo = async (_id) => {
         try {
-            const result = await bookings.find({client : _id})
+            const result = await bookings.find({client : _id, $and : [{status : "PENDING"}, {status : {$ne : "DELETED"}}]})
+            .populate('shop', 'serviceProfileImage')
             return res.status(200).send(result)
         } catch (error) {
             return res.status(400).send({error})
@@ -67,6 +68,145 @@ module.exports.getBooking = async (req,res) => {
       }
 }
 
+// get topay bookings for specific user
+module.exports.CLIENT_getToPayBooking = async (req,res) => {
+    const accessToken = req.cookies.accessToken
+    const getBookingInfo = async (_id) => {
+        try {
+            const result = await bookings.find({client : _id, $and : [{status : "ToPay"}, {status : {$ne : "DELETED"}}]})
+            return res.status(200).send(result)
+        } catch (error) {
+            return res.status(400).send({error})
+        }
+    }
+
+    if (!accessToken) {
+        return res.status(401).json({ error: 'Unauthorized' });
+      }
+    
+      try {
+        jwt.verify(accessToken, process.env.SECRET_KEY, (err, user)=>{
+          if(err)
+          {
+              return res.status(403).json({ error: 'Forbidden' });
+          }
+          
+          getBookingInfo(user._id)
+        });
+      } catch (err) {
+        if (err.name === 'TokenExpiredError') {
+          return res.status(401).json({ error: 'Token expired' });
+        } else {
+          return res.status(403).json({ error: 'Forbidden' });
+        }
+      }
+}
+
+// get Accepted bookings for specific user
+module.exports.CLIENT_getAcceptedBooking = async (req,res) => {
+    const accessToken = req.cookies.accessToken
+    const getBookingInfo = async (_id) => {
+        try {
+            const result = await bookings.find({client : _id, $and : [{status : "ACCEPTED"}, {status : {$ne : "DELETED"}}]})
+            return res.status(200).send(result)
+        } catch (error) {
+            return res.status(400).send({error})
+        }
+    }
+
+    if (!accessToken) {
+        return res.status(401).json({ error: 'Unauthorized' });
+      }
+    
+      try {
+        jwt.verify(accessToken, process.env.SECRET_KEY, (err, user)=>{
+          if(err)
+          {
+              return res.status(403).json({ error: 'Forbidden' });
+          }
+          
+          getBookingInfo(user._id)
+        });
+      } catch (err) {
+        if (err.name === 'TokenExpiredError') {
+          return res.status(401).json({ error: 'Token expired' });
+        } else {
+          return res.status(403).json({ error: 'Forbidden' });
+        }
+      }
+}
+
+// get Rejected bookings for specific user
+module.exports.CLIENT_getRejectedBooking = async (req,res) => {
+    const accessToken = req.cookies.accessToken
+    const getBookingInfo = async (_id) => {
+        try {
+            const result = await bookings.find({client : _id, $and : [{status : "REJECTED"}, {status : {$ne : "DELETED"}}]})
+            return res.status(200).send(result)
+        } catch (error) {
+            return res.status(400).send({error})
+        }
+    }
+
+    if (!accessToken) {
+        return res.status(401).json({ error: 'Unauthorized' });
+      }
+    
+      try {
+        jwt.verify(accessToken, process.env.SECRET_KEY, (err, user)=>{
+          if(err)
+          {
+              return res.status(403).json({ error: 'Forbidden' });
+          }
+          
+          getBookingInfo(user._id)
+        });
+      } catch (err) {
+        if (err.name === 'TokenExpiredError') {
+          return res.status(401).json({ error: 'Token expired' });
+        } else {
+          return res.status(403).json({ error: 'Forbidden' });
+        }
+      }
+}
+
+// get History of bookings for specific user
+module.exports.CLIENT_getHistoryBooking = async (req,res) => {
+    const accessToken = req.cookies.accessToken
+    const getBookingInfo = async (_id) => {
+        try {
+            const result = await bookings.find({$and: [{ client : _id },{$or: [{ status: "DONE" },{ status: "CANCELLED" }]},{ status: { $ne: "DELETED" } }]})
+            return res.status(200).send(result)
+        } catch (error) {
+            return res.status(400).send({error})
+        }
+    }
+
+    if (!accessToken) {
+        return res.status(401).json({ error: 'Unauthorized' });
+      }
+    
+      try {
+        jwt.verify(accessToken, process.env.SECRET_KEY, (err, user)=>{
+          if(err)
+          {
+              return res.status(403).json({ error: 'Forbidden' });
+          }
+          
+          getBookingInfo(user._id)
+        });
+      } catch (err) {
+        if (err.name === 'TokenExpiredError') {
+          return res.status(401).json({ error: 'Token expired' });
+        } else {
+          return res.status(403).json({ error: 'Forbidden' });
+        }
+      }
+}
+
+
+
+// For OWNER OR SERVICE PROVIDER
 // get Pending bookings for specific user
 module.exports.getPendingBooking = async (req,res) => {
     const {_id} = req.params
