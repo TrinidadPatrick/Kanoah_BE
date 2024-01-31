@@ -22,7 +22,7 @@ module.exports.addBooking = async (req,res) => {
     const data = req.body
     try {
         const result = await bookings.create({shop : data.shop, service : data.service, schedule : data.schedule, 
-        contactAndAddress : data.contactAndAddress, createdAt : data.createdAt, Booking_id : data.booking_id, client : data.client 
+        contactAndAddress : data.contactAndAddress, createdAt : data.createdAt, Booking_id : data.booking_id, service_fee : data.service_fee, booking_fee : data.booking_fee , client : data.client 
         })
         if(result)
         {
@@ -213,6 +213,16 @@ module.exports.getPendingBooking = async (req,res) => {
 
     try {
         const result = await bookings.find({shop: _id, $and: [{ status: "PENDING" },{ status: { $ne: "DELETED" } }]})
+        return res.status(200).send(result)
+    } catch (error) {
+        return res.status(400).send({error})
+    }
+}
+module.exports.getPendingPaymentBooking = async (req,res) => {
+    const {_id} = req.params
+
+    try {
+        const result = await bookings.find({shop: _id, $and: [{ status: "ToPay" },{ status: { $ne: "DELETED" } }]})
         return res.status(200).send(result)
     } catch (error) {
         return res.status(400).send({error})

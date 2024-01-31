@@ -41,7 +41,6 @@ let onlineUsers = [];
 
 const addNewUser = (username, socketId) => {
     !onlineUsers.some((user) => user.username === username) && onlineUsers.push({ username, socketId });
-    console.log(onlineUsers);
 }
 
 const removeUser = (socketId) => {

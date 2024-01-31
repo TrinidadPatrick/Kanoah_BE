@@ -17,6 +17,43 @@ function generateRandomId(length) {
     return randomId;
 }
 
+
+// CHeck for unread messages
+module.exports.checkUnreadMessages = async (req,res) => {
+    const accessToken = req.cookies.accessToken
+    const checkMessage = async (userId) => {
+        try {
+            const unreadMessages = await messages.find({
+                participants: userId,
+                readBy: { $nin: [userId] }
+              }).select("conversationId")
+            return res.status(200).json(unreadMessages)
+        } catch (error) {
+            return res.status(500).json({ error: error });
+        }
+    }
+    if (!accessToken) {
+        return res.status(401).json({ error: 'Unauthorized' });
+      }
+    
+      try {
+        jwt.verify(accessToken, process.env.SECRET_KEY, (err, user)=>{
+          if(err)
+          {
+              return res.status(403).json({ error: 'Forbidden' });
+          }
+          
+          checkMessage(user._id)
+        });
+      } catch (err) {
+        if (err.name === 'TokenExpiredError') {
+          return res.status(401).json({ error: 'Token expired' });
+        } else {
+          return res.status(403).json({ error: 'Forbidden' });
+        }
+      }
+}
+
 //Get all Users except the current user
 module.exports.fetchAllUsers = async (req,res) => {
     
@@ -145,7 +182,6 @@ module.exports.getMessages = async (req,res) => {
     const {conversationId} = req.params
     const {returnLimit} = req.params
     const accessToken = req.cookies.accessToken
-    const token = req.headers.authorization?.split(' ')[1];
 
     const getMessage = async (user) => {
         try {

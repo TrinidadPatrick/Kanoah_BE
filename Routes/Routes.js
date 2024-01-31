@@ -1,11 +1,12 @@
 
 const {Router} = require('express')
 const { loginasAdmin, addAdmin, logout, checkStatus, getAdminInfo, getAdmins, refreshAdmin, addCategory, getCategories, updateCategories } = require('../Controllers/AdminController')
-const { addBooking, CLIENT_getPendingBooking, respondBooking, getBookingSchedules, getPendingBooking, getAcceptedBooking, getRejectedBooking, getBookingHistory, CLIENT_getToPayBooking, CLIENT_getAcceptedBooking, CLIENT_getRejectedBooking, CLIENT_getHistoryBooking } = require('../Controllers/BookingsController')
+const { addBooking, CLIENT_getPendingBooking, respondBooking, getBookingSchedules, getPendingBooking, getAcceptedBooking, getRejectedBooking, getBookingHistory, CLIENT_getToPayBooking, CLIENT_getAcceptedBooking, CLIENT_getRejectedBooking, CLIENT_getHistoryBooking, getPendingPaymentBooking } = require('../Controllers/BookingsController')
 const { getAllChats, sendChat, getUserChats, readChat, deleteConvo } = require('../Controllers/ChatController')
 const { addToDoNotShow, getDoNotShow, removeDoNotShow } = require('../Controllers/DoNotShowController')
 const { addFavorites, getFavorites, removeFavorites } = require('../Controllers/FavoritesController')
-const { fetchAllUsers, getReceiver, getServiceFromChat, sendMessage, retrieveContacts, getMessages, getAllMessages, handleReadMessage, viewChatMemberProfile, handleDeleteConversation,  } = require('../Controllers/MessageController')
+const { payGcash, checkPaymentStatus } = require('../Controllers/GcashController')
+const { fetchAllUsers, getReceiver, getServiceFromChat, sendMessage, retrieveContacts, getMessages, getAllMessages, handleReadMessage, viewChatMemberProfile, handleDeleteConversation, checkUnreadMessages,  } = require('../Controllers/MessageController')
 const { getServices, addService, getService, addGalleryImage, getGalleryImages, deleteImage, deleteMultipleImages, addFeaturedImage, getFeaturedImages, deleteFeaturedImage, deleteMultipleFeaturedImages, updateProfilePicture, getServiceInfo, getServiceProfile, updateService } = require('../Controllers/ServiceController')
 const {register, verifyEmail, verifyOTP, login, forgotPassword, newPassword, submitOtpForNewPassword, verifyUsername, getUsers, getUser, updateUser, verifyPassword, updatePassword, deactivateAccount, refresh, profile, handleFb, handleFbLogin, getUserInfo, userLogout} = require('../Controllers/UserController')
 const router = Router()
@@ -74,6 +75,7 @@ router.get('/getAllMessages/:_id', getAllMessages)
 router.put('/handleReadMessage', handleReadMessage)
 router.get('/viewChatMemberProfile/:_id', viewChatMemberProfile)
 router.delete('/handleDeleteConversation/:conversationId', handleDeleteConversation)
+router.get('/checkUnreadMessages', checkUnreadMessages)
 
 // admin Route
 router.post('/loginasAdmin', loginasAdmin)
@@ -99,6 +101,7 @@ router.get('/CLIENT_getHistoryBooking', CLIENT_getHistoryBooking)
 
 router.get('/getAcceptedBooking/:_id', getAcceptedBooking)
 router.get('/getRejectedBooking/:_id', getRejectedBooking)
+router.get('/getPendingPaymentBooking/:_id', getPendingPaymentBooking)
 router.get('/getBookingHistory/:_id', getBookingHistory)
 router.get('/getPendingBooking/:_id', getPendingBooking)
 router.patch('/respondBooking/:_id', respondBooking)
@@ -112,6 +115,9 @@ router.delete('/removeFavorite/:serviceId', removeFavorites)
 router.post('/addToDoNotShow', addToDoNotShow)
 router.get('/getDoNotShow', getDoNotShow)
 router.delete('/removeDoNotShow/:serviceId', removeDoNotShow)
+
+router.post('/payGcash', payGcash)
+router.get('/checkPaymentStatus/:invoiceId', checkPaymentStatus)
 
 
 module.exports = router;

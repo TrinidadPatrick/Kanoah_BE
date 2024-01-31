@@ -24,6 +24,14 @@ const BookingSchema = new mongoose.Schema({
         type : Date,
         required : true
     },
+    service_fee : {
+        type : Number,
+        required : true
+    },
+    booking_fee : {
+        type : Number,
+        required : true
+    },
     Booking_id : {
         type : String,
         required : true
