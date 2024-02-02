@@ -15,7 +15,7 @@ const BookingSchema = new mongoose.Schema({
     },
     status : {
         type: String,
-        default : "PENDING"
+        default : "INPROGRESS"
     },
     contactAndAddress : {
         type : Object
@@ -32,7 +32,11 @@ const BookingSchema = new mongoose.Schema({
         type : Number,
         required : true
     },
-    Booking_id : {
+    net_Amount : {
+        type : Number,
+        required : true
+    },
+    booking_id : {
         type : String,
         required : true
     }

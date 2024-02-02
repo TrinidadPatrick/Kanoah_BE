@@ -1,7 +1,7 @@
 
 const {Router} = require('express')
 const { loginasAdmin, addAdmin, logout, checkStatus, getAdminInfo, getAdmins, refreshAdmin, addCategory, getCategories, updateCategories } = require('../Controllers/AdminController')
-const { addBooking, CLIENT_getPendingBooking, respondBooking, getBookingSchedules, getPendingBooking, getAcceptedBooking, getRejectedBooking, getBookingHistory, CLIENT_getToPayBooking, CLIENT_getAcceptedBooking, CLIENT_getRejectedBooking, CLIENT_getHistoryBooking, getPendingPaymentBooking } = require('../Controllers/BookingsController')
+const { addBooking, CLIENT_getPendingBooking, respondBooking, getBookingSchedules, getPendingBooking, getAcceptedBooking, getRejectedBooking, getBookingHistory, CLIENT_getToPayBooking, CLIENT_getAcceptedBooking, CLIENT_getRejectedBooking, CLIENT_getHistoryBooking, getPendingPaymentBooking, CLIENT_getInProgressBooking, CLIENT_getCompletedBooking, CLIENT_getCancelledBooking, getInProgressBooking, getCompletedBooking, getCancelledBooking } = require('../Controllers/BookingsController')
 const { getAllChats, sendChat, getUserChats, readChat, deleteConvo } = require('../Controllers/ChatController')
 const { addToDoNotShow, getDoNotShow, removeDoNotShow } = require('../Controllers/DoNotShowController')
 const { addFavorites, getFavorites, removeFavorites } = require('../Controllers/FavoritesController')
@@ -92,18 +92,16 @@ router.put('/updateCategories', updateCategories)
 // Booking Route
 router.get('/getBookingSchedules/:shop_id', getBookingSchedules)
 router.post('/addBooking', addBooking)
-router.get('/CLIENT_getPendingBooking', CLIENT_getPendingBooking)
-router.get('/CLIENT_getToPayBooking', CLIENT_getToPayBooking)
-router.get('/CLIENT_getAcceptedBooking', CLIENT_getAcceptedBooking)
-router.get('/CLIENT_getRejectedBooking', CLIENT_getRejectedBooking)
+router.get('/CLIENT_getInProgressBooking', CLIENT_getInProgressBooking)
+router.get('/CLIENT_getCompletedBooking', CLIENT_getCompletedBooking)
+router.get('/CLIENT_getCancelledBooking', CLIENT_getCancelledBooking)
 router.get('/CLIENT_getHistoryBooking', CLIENT_getHistoryBooking)
 
 
-router.get('/getAcceptedBooking/:_id', getAcceptedBooking)
-router.get('/getRejectedBooking/:_id', getRejectedBooking)
-router.get('/getPendingPaymentBooking/:_id', getPendingPaymentBooking)
+router.get('/getCompletedBooking/:_id', getCompletedBooking)
+router.get('/getCancelledBooking/:_id', getCancelledBooking)
 router.get('/getBookingHistory/:_id', getBookingHistory)
-router.get('/getPendingBooking/:_id', getPendingBooking)
+router.get('/getInProgressBooking/:_id', getInProgressBooking)
 router.patch('/respondBooking/:_id', respondBooking)
 
 // Favorite route

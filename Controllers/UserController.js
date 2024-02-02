@@ -37,6 +37,7 @@ module.exports.getUsers = async (req,res) =>{
 // Get specific User
 module.exports.getUser = async (req, res) => {
     const accessToken = req.cookies.accessToken
+
     const getuserInfo = async (userId) => {
       try {
         const userInfo = await user.findOne({ _id: userId });

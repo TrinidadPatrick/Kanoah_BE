@@ -22,7 +22,7 @@ module.exports.addBooking = async (req,res) => {
     const data = req.body
     try {
         const result = await bookings.create({shop : data.shop, service : data.service, schedule : data.schedule, 
-        contactAndAddress : data.contactAndAddress, createdAt : data.createdAt, Booking_id : data.booking_id, service_fee : data.service_fee, booking_fee : data.booking_fee , client : data.client 
+        contactAndAddress : data.contactAndAddress, createdAt : data.createdAt, Booking_id : data.booking_id, service_fee : data.service_fee, booking_fee : data.booking_fee , net_Amount : data.net_Amount, client : data.client 
         })
         if(result)
         {
@@ -34,11 +34,11 @@ module.exports.addBooking = async (req,res) => {
 }
 
 // get pending bookings for specific user
-module.exports.CLIENT_getPendingBooking = async (req,res) => {
+module.exports.CLIENT_getInProgressBooking = async (req,res) => {
     const accessToken = req.cookies.accessToken
     const getBookingInfo = async (_id) => {
         try {
-            const result = await bookings.find({client : _id, $and : [{status : "PENDING"}, {status : {$ne : "DELETED"}}]})
+            const result = await bookings.find({client : _id, $and : [{status : "INPROGRESS"}, {status : {$ne : "DELETED"}}]})
             .populate('shop', 'serviceProfileImage')
             return res.status(200).send(result)
         } catch (error) {
@@ -68,46 +68,12 @@ module.exports.CLIENT_getPendingBooking = async (req,res) => {
       }
 }
 
-// get topay bookings for specific user
-module.exports.CLIENT_getToPayBooking = async (req,res) => {
-    const accessToken = req.cookies.accessToken
-    const getBookingInfo = async (_id) => {
-        try {
-            const result = await bookings.find({client : _id, $and : [{status : "ToPay"}, {status : {$ne : "DELETED"}}]})
-            return res.status(200).send(result)
-        } catch (error) {
-            return res.status(400).send({error})
-        }
-    }
-
-    if (!accessToken) {
-        return res.status(401).json({ error: 'Unauthorized' });
-      }
-    
-      try {
-        jwt.verify(accessToken, process.env.SECRET_KEY, (err, user)=>{
-          if(err)
-          {
-              return res.status(403).json({ error: 'Forbidden' });
-          }
-          
-          getBookingInfo(user._id)
-        });
-      } catch (err) {
-        if (err.name === 'TokenExpiredError') {
-          return res.status(401).json({ error: 'Token expired' });
-        } else {
-          return res.status(403).json({ error: 'Forbidden' });
-        }
-      }
-}
-
 // get Accepted bookings for specific user
-module.exports.CLIENT_getAcceptedBooking = async (req,res) => {
+module.exports.CLIENT_getCompletedBooking = async (req,res) => {
     const accessToken = req.cookies.accessToken
     const getBookingInfo = async (_id) => {
         try {
-            const result = await bookings.find({client : _id, $and : [{status : "ACCEPTED"}, {status : {$ne : "DELETED"}}]})
+            const result = await bookings.find({client : _id, $and : [{status : "COMPLETED"}, {status : {$ne : "DELETED"}}]})
             return res.status(200).send(result)
         } catch (error) {
             return res.status(400).send({error})
@@ -137,7 +103,7 @@ module.exports.CLIENT_getAcceptedBooking = async (req,res) => {
 }
 
 // get Rejected bookings for specific user
-module.exports.CLIENT_getRejectedBooking = async (req,res) => {
+module.exports.CLIENT_getCancelledBooking = async (req,res) => {
     const accessToken = req.cookies.accessToken
     const getBookingInfo = async (_id) => {
         try {
@@ -175,7 +141,7 @@ module.exports.CLIENT_getHistoryBooking = async (req,res) => {
     const accessToken = req.cookies.accessToken
     const getBookingInfo = async (_id) => {
         try {
-            const result = await bookings.find({$and: [{ client : _id },{$or: [{ status: "DONE" },{ status: "CANCELLED" }]},{ status: { $ne: "DELETED" } }]})
+            const result = await bookings.find({$and: [{ client : _id },{$or: [{ status: "COMEPLETED" },{ status: "CANCELLED" }]},{ status: { $ne: "DELETED" } }]})
             return res.status(200).send(result)
         } catch (error) {
             return res.status(400).send({error})
@@ -208,32 +174,23 @@ module.exports.CLIENT_getHistoryBooking = async (req,res) => {
 
 // For OWNER OR SERVICE PROVIDER
 // get Pending bookings for specific user
-module.exports.getPendingBooking = async (req,res) => {
+module.exports.getInProgressBooking = async (req,res) => {
     const {_id} = req.params
 
     try {
-        const result = await bookings.find({shop: _id, $and: [{ status: "PENDING" },{ status: { $ne: "DELETED" } }]})
+        const result = await bookings.find({shop: _id, $and: [{ status: "INPROGRESS" },{ status: { $ne: "DELETED" } }]})
         return res.status(200).send(result)
     } catch (error) {
         return res.status(400).send({error})
     }
 }
-module.exports.getPendingPaymentBooking = async (req,res) => {
-    const {_id} = req.params
 
-    try {
-        const result = await bookings.find({shop: _id, $and: [{ status: "ToPay" },{ status: { $ne: "DELETED" } }]})
-        return res.status(200).send(result)
-    } catch (error) {
-        return res.status(400).send({error})
-    }
-}
 // get Accepted bookings for specific user
-module.exports.getAcceptedBooking = async (req,res) => {
+module.exports.getCompletedBooking = async (req,res) => {
     const {_id} = req.params
 
     try {
-        const result = await bookings.find({shop: _id, $and: [{ status: "ACCEPTED" },{ status: { $ne: "DELETED" } }]})
+        const result = await bookings.find({shop: _id, $and: [{ status: "COMPLETED" },{ status: { $ne: "DELETED" } }]})
         
         return res.status(200).send(result)
     } catch (error) {
@@ -245,18 +202,18 @@ module.exports.getBookingHistory = async (req,res) => {
     const {_id} = req.params
 
     try {
-        const result = await bookings.find({$and: [{ shop: _id },{$or: [{ status: "DONE" },{ status: "CANCELLED" }]},{ status: { $ne: "DELETED" } }]})
+        const result = await bookings.find({$and: [{ shop: _id },{$or: [{ status: "COMPLETED" },{ status: "CANCELLED" }]},{ status: { $ne: "DELETED" } }]})
         return res.status(200).send(result)
     } catch (error) {
         return res.status(400).send({error})
     }
 }
 // get Rejected bookings for specific user
-module.exports.getRejectedBooking = async (req,res) => {
+module.exports.getCancelledBooking = async (req,res) => {
     const {_id} = req.params
 
     try {
-        const result = await bookings.find({shop: _id, $and: [{ status: "REJECTED" },{ status: { $ne: "DELETED" } }]})
+        const result = await bookings.find({shop: _id, $and: [{ status: "CANCELLED" },{ status: { $ne: "DELETED" } }]})
         return res.status(200).send(result)
     } catch (error) {
         return res.status(400).send({error})
