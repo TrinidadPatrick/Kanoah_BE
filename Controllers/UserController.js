@@ -461,7 +461,7 @@ module.exports.newPassword = async (req,res) => {
 }
 
 module.exports.userLogout = async (req,res) => {
-    res.clearCookie('accessToken', { httpOnly: true });
+    res.cookie('accessToken', null, {secure: true , httpOnly: true , sameSite: 'None',maxAge: -1  });   
     return res.status(200).send({message : 'success'})
 }
 
