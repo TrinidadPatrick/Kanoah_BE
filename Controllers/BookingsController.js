@@ -39,7 +39,7 @@ module.exports.CLIENT_getInProgressBooking = async (req,res) => {
     const getBookingInfo = async (_id) => {
         try {
             const result = await bookings.find({client : _id, $and : [{status : "INPROGRESS"}, {status : {$ne : "DELETED"}}]})
-            .populate('shop', 'serviceProfileImage')
+            .populate('shop', 'serviceProfileImage basicInformation')
             return res.status(200).send(result)
         } catch (error) {
             return res.status(400).send({error})
@@ -74,6 +74,7 @@ module.exports.CLIENT_getCompletedBooking = async (req,res) => {
     const getBookingInfo = async (_id) => {
         try {
             const result = await bookings.find({client : _id, $and : [{status : "COMPLETED"}, {status : {$ne : "DELETED"}}]})
+            .populate('shop', 'serviceProfileImage basicInformation')
             return res.status(200).send(result)
         } catch (error) {
             return res.status(400).send({error})
@@ -107,7 +108,8 @@ module.exports.CLIENT_getCancelledBooking = async (req,res) => {
     const accessToken = req.cookies.accessToken
     const getBookingInfo = async (_id) => {
         try {
-            const result = await bookings.find({client : _id, $and : [{status : "REJECTED"}, {status : {$ne : "DELETED"}}]})
+            const result = await bookings.find({client : _id, $and : [{status : "CANCELLED"}, {status : {$ne : "DELETED"}}]})
+            .populate('shop', 'serviceProfileImage basicInformation')
             return res.status(200).send(result)
         } catch (error) {
             return res.status(400).send({error})
@@ -141,7 +143,8 @@ module.exports.CLIENT_getHistoryBooking = async (req,res) => {
     const accessToken = req.cookies.accessToken
     const getBookingInfo = async (_id) => {
         try {
-            const result = await bookings.find({$and: [{ client : _id },{$or: [{ status: "COMEPLETED" },{ status: "CANCELLED" }]},{ status: { $ne: "DELETED" } }]})
+            const result = await bookings.find({$and: [{ client : _id },{$or: [{ status: "COMPLETED" },{ status: "CANCELLED" }]},{ status: { $ne: "DELETED" } }]})
+            .populate('shop', 'serviceProfileImage basicInformation')
             return res.status(200).send(result)
         } catch (error) {
             return res.status(400).send({error})
