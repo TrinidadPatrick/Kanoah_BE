@@ -39,6 +39,10 @@ const BookingSchema = new mongoose.Schema({
     booking_id : {
         type : String,
         required : true
+    },
+    rated : {
+        type : Boolean,
+        default : false
     }
 })
 

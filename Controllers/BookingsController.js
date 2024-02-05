@@ -22,7 +22,7 @@ module.exports.addBooking = async (req,res) => {
     const data = req.body
     try {
         const result = await bookings.create({shop : data.shop, service : data.service, schedule : data.schedule, 
-        contactAndAddress : data.contactAndAddress, createdAt : data.createdAt, Booking_id : data.booking_id, service_fee : data.service_fee, booking_fee : data.booking_fee , net_Amount : data.net_Amount, client : data.client 
+        contactAndAddress : data.contactAndAddress, createdAt : data.createdAt, booking_id : data.booking_id, service_fee : data.service_fee, booking_fee : data.booking_fee , net_Amount : data.net_Amount, client : data.client 
         })
         if(result)
         {
