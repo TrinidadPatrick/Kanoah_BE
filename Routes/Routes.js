@@ -7,6 +7,7 @@ const { addToDoNotShow, getDoNotShow, removeDoNotShow } = require('../Controller
 const { addFavorites, getFavorites, removeFavorites } = require('../Controllers/FavoritesController')
 const { payGcash, checkPaymentStatus } = require('../Controllers/GcashController')
 const { fetchAllUsers, getReceiver, getServiceFromChat, sendMessage, retrieveContacts, getMessages, getAllMessages, handleReadMessage, viewChatMemberProfile, handleDeleteConversation, checkUnreadMessages,  } = require('../Controllers/MessageController')
+const { addNotification, getNotifications, markAsRead } = require('../Controllers/NotificationController')
 const { AddRating, getAllRatings } = require('../Controllers/RatingController')
 const { getServices, addService, getService, addGalleryImage, getGalleryImages, deleteImage, deleteMultipleImages, addFeaturedImage, getFeaturedImages, deleteFeaturedImage, deleteMultipleFeaturedImages, updateProfilePicture, getServiceInfo, getServiceProfile, updateService } = require('../Controllers/ServiceController')
 const {register, verifyEmail, verifyOTP, login, forgotPassword, newPassword, submitOtpForNewPassword, verifyUsername, getUsers, getUser, updateUser, verifyPassword, updatePassword, deactivateAccount, refresh, profile, handleFb, handleFbLogin, getUserInfo, userLogout} = require('../Controllers/UserController')
@@ -121,6 +122,11 @@ router.get('/checkPaymentStatus/:invoiceId', checkPaymentStatus)
 // Rating route
 router.post('/AddRating', AddRating)
 router.get('/getAllRatings', getAllRatings)
+
+// Notification Route
+router.post('/addNotification', addNotification)
+router.get('/getNotifications', getNotifications)
+router.patch('/markAsRead', markAsRead)
 
 
 module.exports = router;

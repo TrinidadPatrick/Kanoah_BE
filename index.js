@@ -53,10 +53,21 @@ const getUser = (username) => {
 
 // For socket.io
 io.on('connection', (socket) => {
+    // Notify user theres a new message
     socket.on('message', ({ notificationMessage, receiverName }) => {
         const receiver = getUser(receiverName);
         if (receiver !== undefined) {
             io.to(receiver.socketId).emit('message', notificationMessage);
+        }
+    });
+
+    // Notify user theres a new booking
+    socket.on('Booking_Notification', ({ notification, receiver }) => {
+        
+        const receiverUser = getUser(receiver);
+        console.log(notification)
+        if (receiverUser !== undefined) {
+            io.to(receiverUser.socketId).emit('Booking_Notification', notification);
         }
     });
 
