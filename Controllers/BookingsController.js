@@ -73,8 +73,8 @@ module.exports.CLIENT_getCompletedBooking = async (req,res) => {
     const accessToken = req.cookies.accessToken
     const getBookingInfo = async (_id) => {
         try {
-            const result = await bookings.find({client : _id, $and : [{status : "COMPLETED"}, {status : {$ne : "DELETED"}}]})
-            .populate('shop', 'serviceProfileImage basicInformation')
+            const result = await bookings.find({client : _id, $and : [{status : "COMPLETED"}, {status : {$ne : "DELETED"}}]}).sort({ createdAt: -1 })
+            .populate('shop', 'serviceProfileImage basicInformation owner')
             return res.status(200).send(result)
         } catch (error) {
             return res.status(400).send({error})

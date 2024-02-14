@@ -7,8 +7,8 @@ const { addToDoNotShow, getDoNotShow, removeDoNotShow } = require('../Controller
 const { addFavorites, getFavorites, removeFavorites } = require('../Controllers/FavoritesController')
 const { payGcash, checkPaymentStatus } = require('../Controllers/GcashController')
 const { fetchAllUsers, getReceiver, getServiceFromChat, sendMessage, retrieveContacts, getMessages, getAllMessages, handleReadMessage, viewChatMemberProfile, handleDeleteConversation, checkUnreadMessages,  } = require('../Controllers/MessageController')
-const { addNotification, getNotifications, markAsRead } = require('../Controllers/NotificationController')
-const { AddRating, getAllRatings } = require('../Controllers/RatingController')
+const { addNotification, getNotifications, markAsRead, countUnreadNotifs, markAllAsRead } = require('../Controllers/NotificationController')
+const { AddRating, getAllRatings, getUserRatings, getServiceRatings, removeRating, restoreRating, getServiceRatingWithFilter } = require('../Controllers/RatingController')
 const { getServices, addService, getService, addGalleryImage, getGalleryImages, deleteImage, deleteMultipleImages, addFeaturedImage, getFeaturedImages, deleteFeaturedImage, deleteMultipleFeaturedImages, updateProfilePicture, getServiceInfo, getServiceProfile, updateService } = require('../Controllers/ServiceController')
 const {register, verifyEmail, verifyOTP, login, forgotPassword, newPassword, submitOtpForNewPassword, verifyUsername, getUsers, getUser, updateUser, verifyPassword, updatePassword, deactivateAccount, refresh, profile, handleFb, handleFbLogin, getUserInfo, userLogout} = require('../Controllers/UserController')
 const router = Router()
@@ -121,12 +121,19 @@ router.get('/checkPaymentStatus/:invoiceId', checkPaymentStatus)
 
 // Rating route
 router.post('/AddRating', AddRating)
+router.get('/getUserRatings', getUserRatings)
+router.get('/getServiceRatings/:service', getServiceRatings)
+router.get('/getServiceRatingWithFilter', getServiceRatingWithFilter)
 router.get('/getAllRatings', getAllRatings)
+router.patch('/removeRating/:ratingId', removeRating)
+router.patch('/restoreRating/:ratingId', restoreRating)
 
 // Notification Route
 router.post('/addNotification', addNotification)
 router.get('/getNotifications', getNotifications)
 router.patch('/markAsRead', markAsRead)
+router.get('/countUnreadNotifs', countUnreadNotifs)
+router.patch('/markAllAsRead', markAllAsRead)
 
 
 module.exports = router;

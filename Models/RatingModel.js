@@ -22,6 +22,11 @@ const RatingSchema = mongoose.Schema({
         type: Date, 
         required : true
     },
+    status : {
+        type : String, 
+        required : true,
+        default : "Active"
+    }
     
 })
 

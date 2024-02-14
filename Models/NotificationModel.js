@@ -16,7 +16,7 @@ const notificationSchema = mongoose.Schema({
         required : true
     },
     content : {
-        type : String,
+        type : Object,
         required : true
     },
     client : {

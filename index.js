@@ -62,12 +62,12 @@ io.on('connection', (socket) => {
     });
 
     // Notify user theres a new booking
-    socket.on('Booking_Notification', ({ notification, receiver }) => {
+    socket.on('New_Notification', ({ notification, receiver }) => {
         
         const receiverUser = getUser(receiver);
         console.log(notification)
         if (receiverUser !== undefined) {
-            io.to(receiverUser.socketId).emit('Booking_Notification', notification);
+            io.to(receiverUser.socketId).emit('New_Notification', notification);
         }
     });
 
