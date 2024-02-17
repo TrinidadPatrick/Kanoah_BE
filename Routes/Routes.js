@@ -10,6 +10,7 @@ const { fetchAllUsers, getReceiver, getServiceFromChat, sendMessage, retrieveCon
 const { addNotification, getNotifications, markAsRead, countUnreadNotifs, markAllAsRead } = require('../Controllers/NotificationController')
 const { AddRating, getAllRatings, getUserRatings, getServiceRatings, removeRating, restoreRating, getServiceRatingWithFilter } = require('../Controllers/RatingController')
 const { getServices, addService, getService, addGalleryImage, getGalleryImages, deleteImage, deleteMultipleImages, addFeaturedImage, getFeaturedImages, deleteFeaturedImage, deleteMultipleFeaturedImages, updateProfilePicture, getServiceInfo, getServiceProfile, updateService } = require('../Controllers/ServiceController')
+const { countBookings, countRatings, getRatingAverage, getTotalSales, getMonthlySales, getMonthlyBookings, getDBBookings, getDBServiceOffers } = require('../Controllers/ServiceDashboardController')
 const {register, verifyEmail, verifyOTP, login, forgotPassword, newPassword, submitOtpForNewPassword, verifyUsername, getUsers, getUser, updateUser, verifyPassword, updatePassword, deactivateAccount, refresh, profile, handleFb, handleFbLogin, getUserInfo, userLogout} = require('../Controllers/UserController')
 const router = Router()
 
@@ -135,5 +136,15 @@ router.patch('/markAsRead', markAsRead)
 router.get('/countUnreadNotifs', countUnreadNotifs)
 router.patch('/markAllAsRead', markAllAsRead)
 
+
+// DashBoard Route
+router.get('/countBookings', countBookings)
+router.get('/countRatings', countRatings)
+router.get('/getRatingAverage', getRatingAverage)
+router.get('/getTotalSales', getTotalSales)
+router.get('/getMonthlySales', getMonthlySales)
+router.get('/getMonthlyBookings', getMonthlyBookings)
+router.get('/getDBBookings', getDBBookings)
+router.get('/getDBServiceOffers', getDBServiceOffers)
 
 module.exports = router;
