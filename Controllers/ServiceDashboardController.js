@@ -350,6 +350,7 @@ module.exports.getDBBookings = async (req,res) => {
     const accessToken = req.cookies.accessToken
     const service = req.query.service
     const filter = req.query.filter
+    const dateFilter = req.query.dateFilter
 
     const filterValue = filter.toUpperCase()
 
@@ -359,6 +360,10 @@ module.exports.getDBBookings = async (req,res) => {
             {
                 const result = await bookings.find({
                     shop : service,
+                    createdAt: dateFilter ? {
+                        $gte: new Date(dateFilter + "-01"),
+                        $lt: new Date(new Date(dateFilter + "-01").setMonth(new Date(dateFilter + "-01").getMonth() + 1))
+                      } : null
                 }).populate('client', 'firstname lastname')
 
                 return res.status(200).json(result)
@@ -367,7 +372,11 @@ module.exports.getDBBookings = async (req,res) => {
             {
                 const result = await bookings.find({
                     shop : service,
-                    status : filterValue
+                    status : filterValue,
+                    createdAt: dateFilter ? {
+                        $gte: new Date(dateFilter + "-01"),
+                        $lt: new Date(new Date(dateFilter + "-01").setMonth(new Date(dateFilter + "-01").getMonth() + 1))
+                      } : null
                 }).populate('client', 'firstname lastname')
                 return res.status(200).json(result)
             }
@@ -405,11 +414,17 @@ module.exports.getDBBookings = async (req,res) => {
 module.exports.getDBServiceOffers = async (req,res) => {
     const accessToken = req.cookies.accessToken
     const service = req.query.service
+    const dateFilter = req.query.dateFilter
 
     const getServiceOffers = async () => {
         try {
             const serviceOffers = await Service.findById(service).select('serviceOffers')
-            const bookingResult = await bookings.find({shop : service}).select('service')
+            const bookingResult = await bookings.find({shop : service,
+                createdAt: dateFilter ? {
+                    $gte: new Date(dateFilter + "-01"),
+                    $lt: new Date(new Date(dateFilter + "-01").setMonth(new Date(dateFilter + "-01").getMonth() + 1))
+                  } : null
+            }).select('service')
             return res.status(200).json({serviceOffers, bookingResult})
         } catch (error) {
             return res.status(500).json(error)
