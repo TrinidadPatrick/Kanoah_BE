@@ -12,6 +12,7 @@ const { AddRating, getAllRatings, getUserRatings, getServiceRatings, removeRatin
 const { getServices, addService, getService, addGalleryImage, getGalleryImages, deleteImage, deleteMultipleImages, addFeaturedImage, getFeaturedImages, deleteFeaturedImage, deleteMultipleFeaturedImages, updateProfilePicture, getServiceInfo, getServiceProfile, updateService } = require('../Controllers/ServiceController')
 const { countBookings, countRatings, getRatingAverage, getTotalSales, getMonthlySales, getMonthlyBookings, getDBBookings, getDBServiceOffers } = require('../Controllers/ServiceDashboardController')
 const {register, verifyEmail, verifyOTP, login, forgotPassword, newPassword, submitOtpForNewPassword, verifyUsername, getUsers, getUser, updateUser, verifyPassword, updatePassword, deactivateAccount, refresh, profile, handleFb, handleFbLogin, getUserInfo, userLogout} = require('../Controllers/UserController')
+const { Mobile_login } = require('../MobileControllers/UserController')
 const router = Router()
 
 // User Routes
@@ -146,5 +147,9 @@ router.get('/getMonthlySales', getMonthlySales)
 router.get('/getMonthlyBookings', getMonthlyBookings)
 router.get('/getDBBookings', getDBBookings)
 router.get('/getDBServiceOffers', getDBServiceOffers)
+
+
+
+router.post("/loginMobile", Mobile_login)
 
 module.exports = router;

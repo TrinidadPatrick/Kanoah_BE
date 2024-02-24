@@ -387,7 +387,7 @@ module.exports.forgotPassword = async (req,res) => {
 
       if(result != null){
 
-        const letters = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "j", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z", 1, 2, 3, 4, 5, 6, 7, 8, 9]
+        const letters = [1, 2, 3, 4, 5, 6, 7, 8, 9]
         const arr = []
         for(var i=1; i<7;i++){
         arr.push(letters[Math.floor(Math.random() * letters.length)])
