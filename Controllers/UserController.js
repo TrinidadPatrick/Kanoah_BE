@@ -187,7 +187,7 @@ module.exports.register = async (req,res) => {
         
         const hashedPassword = await bcrypt.hash(password, 10)
         await user.create({username, email, password : hashedPassword, firstname, lastname, contact, birthDate : birthDate, profileImage : image, verified : true, Address : null}).then((response)=>{
-            const accessToken = generateToken({username : username, email : email, _id : response._id})
+            const accessToken = generateToken({username : username, email : email.toLowerCase(), _id : response._id})
             const refreshToken = generateRefreshToken({username : username, email : email, _id : response._id})
             const id = response._id
 
@@ -267,11 +267,9 @@ module.exports.deactivateAccount = async (req,res)=> {
 
 // FOR EMAIL VERIFICATION SEND OTP EMAIL
 module.exports.verifyEmail = async (req,res) => {
+    const email = req.body.email
    
-    
-    const verifyDuplicateEmail = await user.findOne({email : req.body.email})
-    
-    // console.log(verifyDuplicateEmail)
+    const verifyDuplicateEmail = await user.findOne({email : email.toLowerCase()})
     if(verifyDuplicateEmail){
         res.json({status : "EmailExist"})
     }
@@ -290,6 +288,9 @@ module.exports.verifyEmail = async (req,res) => {
         auth : {
           user : process.env.USER,
           pass : process.env.PASS
+        },
+        tls: {
+            rejectUnauthorized: false //Remove when in development
         }
       })
 
@@ -339,7 +340,7 @@ module.exports.login = async (req,res) => {
     const UsernameOrEmail = req.body.UsernameOrEmail
     const password = req.body.password
 
-    const result = await user.findOne({ $or : [{username : UsernameOrEmail}, {email : UsernameOrEmail} ] })
+    const result = await user.findOne({ $or : [{username : UsernameOrEmail}, {email : UsernameOrEmail.toLowerCase()} ] })
     if(result != null){
         const comparePassword = await bcrypt.compare(password, result.password)
         if(comparePassword){

@@ -9,9 +9,7 @@ module.exports.payGcash = async (req,res) => {
   const YOUR_SECRET_KEY = 'xnd_development_POyuz5jRjC6pmt45msNOB126rIexa4MjXNSAFO2kz2t0FKOyiw9zDXBhDHbrgS';
 
   const xendit = new Xendit({ secretKey: YOUR_SECRET_KEY });
-  // const xenditPaymentRequestClient = new PaymentRequestClient({ secretKey: YOUR_SECRET_KEY });
   const { Invoice } = xendit
-  const { PaymentRequest } = xendit
 
 
   const data = {
@@ -23,14 +21,18 @@ module.exports.payGcash = async (req,res) => {
     "reminderTime" : 1
   }
 
-  const response= await Invoice.createInvoice({
-    data
-})
+  try {
+    const response= await Invoice.createInvoice({
+      data
+  })
+  
+  console.log(response)
+  res.send(response)
+  } catch (error) {
+    return res.status(500).json(error)
+  }
 
-console.log(response)
 
-
-res.send(response)
 
 }
 
