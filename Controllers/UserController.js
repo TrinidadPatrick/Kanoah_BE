@@ -9,8 +9,6 @@ const generateToken = (user) => {
     return jwt.sign({ _id : user._id }, process.env.SECRET_KEY, { expiresIn: '5day' });
 }
 
-
-
 // Get All Users
 module.exports.getUsers = async (req,res) =>{
     const accessToken = req.cookies.accessToken
@@ -48,7 +46,6 @@ module.exports.getUser = async (req, res) => {
       }
     };
   
-    // const token = req.headers.authorization?.split(' ')[1];
 
     if (!accessToken) {
       return res.status(401).json({ error: 'Unauthorized' });
@@ -186,10 +183,8 @@ module.exports.register = async (req,res) => {
     }else if (!filterEmail && !filterusername && !filterContact){
         
         const hashedPassword = await bcrypt.hash(password, 10)
-        await user.create({username, email, password : hashedPassword, firstname, lastname, contact, birthDate : birthDate, profileImage : image, verified : true, Address : null}).then((response)=>{
+        await user.create({username, email : email.toLowerCase(), password : hashedPassword, firstname, lastname, contact, birthDate : birthDate, profileImage : image, verified : true, Address : null}).then((response)=>{
             const accessToken = generateToken({username : username, email : email.toLowerCase(), _id : response._id})
-            const refreshToken = generateRefreshToken({username : username, email : email, _id : response._id})
-            const id = response._id
 
             res.json({message : "Registration completed Successfully" , status : "registered", accessToken : accessToken, refreshToken : refreshToken})
         }).catch((err)=>{
@@ -262,7 +257,7 @@ module.exports.deactivateAccount = async (req,res)=> {
 
 // CODE GENERATOR FOR OTP--------------------------------------------------------------------------
 
-    let code = []
+    let code = ''
 // ------------------------------------------------------------------------------------------------
 
 // FOR EMAIL VERIFICATION SEND OTP EMAIL
@@ -274,7 +269,7 @@ module.exports.verifyEmail = async (req,res) => {
         res.json({status : "EmailExist"})
     }
     else{
-        const letters = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "j", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z", 1, 2, 3, 4, 5, 6, 7, 8, 9]
+        const letters = [1, 2, 3, 4, 5, 6, 7, 8, 9]
         const arr = []
         for(var i=1; i<7;i++){
             arr.push(letters[Math.floor(Math.random() * letters.length)])
@@ -318,19 +313,13 @@ module.exports.verifyEmail = async (req,res) => {
 
 // OTP VERIFICATION
 module.exports.verifyOTP = async (req,res) => {
-    // const id = req.body._id
     const otp = req.body.otp
+    console.log(otp, code)
     if(otp == code){
-        res.send("verified")
-        // const userId = await user.find({_id : id}).select("_id")
-        
-        // await user.findByIdAndUpdate(userId, {verified : true}).then(()=>{
-        //     return res.json({message : 'Verified'})
-        // }).catch    ((err)=>{
-        //     return res.json({message : err})
-        // })   
+        res.json({status : "verified"})
+        code = ''
     }else{
-        res.send("Invalid")
+        res.json({status : "invalid"})
     }
 }
 
@@ -347,7 +336,6 @@ module.exports.login = async (req,res) => {
             const accessToken = generateToken({ _id : result._id})
             res.cookie('accessToken', accessToken, {secure: true , httpOnly: true , sameSite: 'None',  expires: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000)  });           
             return res.send({ status: 'authenticated', accessToken })
-            // return res.status(200).send({ status: 'authenticated', accessToken });
 
            
         }else {
@@ -384,8 +372,8 @@ module.exports.profile =  (req,res) => {
 // Forgot Password-----------------------------------------------------------------------------FORGOT PASSWORD---------------------------------------
 let FPcode = ''
 module.exports.forgotPassword = async (req,res) => {
-      const result = await user.findOne({email : req.body.email})
-
+    const email = req.body.email
+      const result = await user.findOne({email : email.toLowerCase()})
       if(result != null){
 
         const letters = [1, 2, 3, 4, 5, 6, 7, 8, 9]
@@ -394,12 +382,14 @@ module.exports.forgotPassword = async (req,res) => {
         arr.push(letters[Math.floor(Math.random() * letters.length)])
         }
         FPcode = arr.join("")
-
         const transporter = nodemailer.createTransport({
             service : 'gmail',
             auth : {
               user : process.env.USER,
               pass : process.env.PASS
+            },
+            tls: {
+                rejectUnauthorized: false //Remove when in development
             }
           })
     
@@ -423,6 +413,7 @@ module.exports.forgotPassword = async (req,res) => {
               console.log(error);
           } else {
               console.log('Nodemailer Email sent: ' + success.response);
+              
           }
       });
       res.json({message : "Found"})
@@ -433,7 +424,7 @@ module.exports.forgotPassword = async (req,res) => {
 
 // Submitted OTP for verification
 module.exports.submitOtpForNewPassword = async (req,res)=>{
-    const email = req.body.email
+   
     const otp = req.body.code
     if(otp == ""){
         res.json({status : "invalid"})
@@ -453,7 +444,7 @@ module.exports.newPassword = async (req,res) => {
     const email = req.body.email
     const hashedPassword = await bcrypt.hash(password, 10)
 
-    const updatePassword = await user.findOneAndUpdate({email : email}, {password : hashedPassword})
+    const updatePassword = await user.findOneAndUpdate({email : email.toLowerCase()}, {password : hashedPassword})
     if(updatePassword){
         res.json({status : "updated"})
     }else {
