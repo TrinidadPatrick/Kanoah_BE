@@ -1,6 +1,7 @@
 const Service = require('../Models/ServiceModel')
 const user = require('../Models/UserModel')
 const category = require("../Models/CategoryModel")
+const ratings = require('../Models/RatingModel')
 const jwt = require('jsonwebtoken')
 require("dotenv").config();
 
@@ -106,10 +107,51 @@ module.exports.getService = async (req,res) => {
 //get service in the viewService from explore
 module.exports.getServiceInfo = async (req,res) => {
     const {_id} = req.params
+
+    const computeRatings = async (service) => {
+      const ratingsList = await ratings.find({service : service._id}).populate('user', 'firstname lastname profileImage')
+
+      const currentDate = new Date();
+      const thisDate = currentDate.toISOString().split('T')[0];
+      const totalRatings = ratingsList.length;
+      const sumOfRatings = ratingsList.reduce((sum, rating) => sum + rating.rating, 0);
+      const average = totalRatings === 0 ? 0 : sumOfRatings / totalRatings;
+      const from = new Date(service.createdAt);
+      const timeDifference = currentDate - from;
+      const seconds = Math.floor(timeDifference / 1000);
+      const minutes = Math.floor(seconds / 60);
+      const hours = Math.floor(minutes / 60);
+      const days = Math.floor(hours / 24);
+      const months = Math.floor(days / 30);
+      const years = Math.floor(months / 12);
+      const createdAgo = years > 0 ? `${years} year${years > 1 ? 's' : ''} ago` : months > 0 ? `${months} month${months > 1 ? 's' : ''} ago` : days > 0 ? `${days} day${days > 1 ? 's' : ''} ago` : hours > 0 ? `${hours} hour${hours > 1 ? 's' : ''} ago` : minutes > 0 ? `${minutes} minute${minutes > 1 ? 's' : ''} ago` : 'Less than a minute ago';
+    
+       return res.json({status : "success", service : {
+        _id : service._id,
+        basicInformation: service.basicInformation,
+        advanceInformation: service.advanceInformation,
+        address: service.address,
+        tags: service.tags,
+        owner : service.owner,
+        serviceProfileImage: service.serviceProfileImage,
+        featuredImages : service.featuredImages,
+        galleryImages : service.galleryImages,
+        serviceHour : service.serviceHour,
+        acceptBooking : service.acceptBooking,
+        ratings : average.toFixed(1),
+        ratingRounded : Math.floor(average),
+        totalReviews : totalRatings,
+        createdAgo : createdAgo,
+        createdAt : service.createdAt
+      }, ratings : ratingsList}) 
+    }
+
+
     if(_id){
         try {
             const service = await Service.findById(_id).populate('owner', 'firstname lastname profileImage username')
-            return res.json({status : "success", service})
+            computeRatings(service)
+            // return res.json({status : "success", service})
         } catch (error) {
             return res.json({status : "failed" , message : error})
         }

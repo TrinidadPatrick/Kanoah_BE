@@ -12,7 +12,8 @@ const { AddRating, getAllRatings, getUserRatings, getServiceRatings, removeRatin
 const { getServices, addService, getService, addGalleryImage, getGalleryImages, deleteImage, deleteMultipleImages, addFeaturedImage, getFeaturedImages, deleteFeaturedImage, deleteMultipleFeaturedImages, updateProfilePicture, getServiceInfo, getServiceProfile, updateService } = require('../Controllers/ServiceController')
 const { countBookings, countRatings, getRatingAverage, getTotalSales, getMonthlySales, getMonthlyBookings, getDBBookings, getDBServiceOffers } = require('../Controllers/ServiceDashboardController')
 const {register, verifyEmail, verifyOTP, login, forgotPassword, newPassword, submitOtpForNewPassword, verifyUsername, getUsers, getUser, updateUser, verifyPassword, updatePassword, deactivateAccount, refresh, profile, handleFb, handleFbLogin, getUserInfo, userLogout} = require('../Controllers/UserController')
-const { Mobile_login, Mobile_getUser, Mobile_GetTopRatedServices, Mobile_GetServices } = require('../MobileControllers/UserController')
+const { Mobile_GetServices, Mobile_GetServicesByFilter } = require('../MobileControllers/MobileServiceController')
+const { Mobile_login, Mobile_getUser } = require('../MobileControllers/UserController')
 const router = Router()
 
 // User Routes
@@ -153,5 +154,6 @@ router.get('/getDBServiceOffers', getDBServiceOffers)
 router.post("/loginMobile", Mobile_login)
 router.get("/Mobile_getUser", Mobile_getUser)
 router.get("/Mobile_GetServices", Mobile_GetServices)
+router.get("/Mobile_GetServicesByFilter", Mobile_GetServicesByFilter)
 
 module.exports = router;
