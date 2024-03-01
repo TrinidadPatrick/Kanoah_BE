@@ -70,6 +70,10 @@ module.exports.Mobile_GetServices = async (req,res) => {
 
 // Get services by filter and search in Explore
 module.exports.Mobile_GetServicesByFilter = async (req,res) => {
+    const categoryId = req.query.category === undefined ? '' : req.query.category
+    const subCategoryId = req.query.subCategory === undefined ? '' : req.query.subCategory
+    const ratingsFilter = req.query.ratings.length === 0 ? [] : req.query.ratings.split(",")
+    console.log(categoryId)
     const computeRatings = async (services) => {
         try {
             const ratingList = await ratings.find()
@@ -108,7 +112,7 @@ module.exports.Mobile_GetServicesByFilter = async (req,res) => {
                         createdAt : service.createdAt
                       }
                     })
-                    return res.json(processedServices);
+                    return processedServices
             
         } catch (error) {
             return res.status(500).json({error})
@@ -116,13 +120,35 @@ module.exports.Mobile_GetServicesByFilter = async (req,res) => {
         
     }
 
-    const getServices = async (userId) => {
+
+    const getServices = async () => {
+      // Meaning there is no rating filter specified
+      if(ratingsFilter.length === 0)
+      {
         try {
-          const services = await Service.find();
-          computeRatings(services)
+          const services = await Service.find({$and : [
+          {'advanceInformation.ServiceCategory' : categoryId !== '' ? categoryId : {$exists : true}}, 
+          {'advanceInformation.ServiceSubCategory' : subCategoryId !== '' ? subCategoryId : {$exists : true}}]});
+          const computed = await computeRatings(services)
+          return res.json({services : computed})
         } catch (error) {
           return error;
         }
+      }
+      else
+      {
+        try {
+          const services = await Service.find({$and : [
+            {'advanceInformation.ServiceCategory' : categoryId !== '' ? categoryId : {$exists : true}}, 
+            {'advanceInformation.ServiceSubCategory' : subCategoryId !== '' ? subCategoryId : {$exists : true}}]});
+          const computed = await computeRatings(services)
+          const filtered = computed.filter((service) => ratingsFilter.some((ratings) => Number(service.ratings) >= Number(ratings) && Number(service.ratings)  < Number(ratings) + 1))
+          return res.json({services : filtered})
+        } catch (error) {
+          return error;
+        }
+      }
+        
       };
 
    

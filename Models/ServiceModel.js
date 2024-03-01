@@ -25,7 +25,7 @@ const ServiceSchema = new mongoose.Schema({
             },
             ServiceSubCategory : {
                 type: mongoose.Schema.Types.ObjectId,
-                default : "",
+                default : null,
                 ref : 'Categories'
             }
         },
