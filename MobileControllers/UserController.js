@@ -74,3 +74,54 @@ module.exports.Mobile_getUser = async (req,res) => {
 
 }
 
+// Update User Profile
+module.exports.Mobile_updateProfile = async (req,res) => {
+  const accessToken = req.headers.authorization.split(' ')[1]
+  const {username, firstname, lastname, contact, email, Address, birthDate, profileImage} = req.body
+
+  const updateUser = async (userId) => {
+    try {
+      const result = await user.findByIdAndUpdate(userId, {
+        $set : {
+          username, firstname, lastname, contact, email, Address, birthDate, profileImage
+        }
+      })
+
+      if (!result) {
+        // Handle the case where the user with the specified ID is not found
+        throw new Error('User not found');
+      }
+  
+      // If the update is successful, you might want to send a success response or the updated user data
+      return res.status(200).json(result);
+    } catch (error) {
+      return res.status(500).json(error)
+    }
+  }
+  
+
+  if (!accessToken) {
+    return res.status(401).json({ error: 'Unauthorized' });
+  }
+
+  try {
+    jwt.verify(accessToken, process.env.SECRET_KEY, (err, user)=>{
+      if(err)
+      {
+        
+          return res.status(403).json({ error: 'Forbidden' });
+      }
+      
+      updateUser(user._id);
+    });
+  } catch (err) {
+      
+    if (err.name === 'TokenExpiredError') {
+      return res.status(401).json({ error: 'Token expired' });
+    } else {
+        console.log(err)
+      return res.status(403).json({ error: 'Forbidden' });
+    }
+  }
+}
+

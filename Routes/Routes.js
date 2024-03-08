@@ -13,7 +13,7 @@ const { getServices, addService, getService, addGalleryImage, getGalleryImages, 
 const { countBookings, countRatings, getRatingAverage, getTotalSales, getMonthlySales, getMonthlyBookings, getDBBookings, getDBServiceOffers } = require('../Controllers/ServiceDashboardController')
 const {register, verifyEmail, verifyOTP, login, forgotPassword, newPassword, submitOtpForNewPassword, verifyUsername, getUsers, getUser, updateUser, verifyPassword, updatePassword, deactivateAccount, refresh, profile, handleFb, handleFbLogin, getUserInfo, userLogout} = require('../Controllers/UserController')
 const { Mobile_GetServices, Mobile_GetServicesByFilter } = require('../MobileControllers/MobileServiceController')
-const { Mobile_login, Mobile_getUser } = require('../MobileControllers/UserController')
+const { Mobile_login, Mobile_getUser, Mobile_updateProfile } = require('../MobileControllers/UserController')
 const router = Router()
 
 // User Routes
@@ -149,10 +149,14 @@ router.get('/getMonthlyBookings', getMonthlyBookings)
 router.get('/getDBBookings', getDBBookings)
 router.get('/getDBServiceOffers', getDBServiceOffers)
 
-// MOBOLE ROUTESS
+// MOBILE ROUTESS
 
 router.post("/loginMobile", Mobile_login)
 router.get("/Mobile_getUser", Mobile_getUser)
+router.patch("/Mobile_updateProfile", Mobile_updateProfile)
+
+
+// Service Routes
 router.get("/Mobile_GetServices", Mobile_GetServices)
 router.get("/Mobile_GetServicesByFilter", Mobile_GetServicesByFilter)
 
