@@ -106,7 +106,7 @@ module.exports.getService = async (req,res) => {
 
 //get service in the viewService from explore
 module.exports.getServiceInfo = async (req,res) => {
-    const {_id} = req.params
+      const {_id} = req.params
 
     const computeRatings = async (service) => {
       const ratingsList = await ratings.find({service : service._id}).populate('user', 'firstname lastname profileImage')
@@ -142,7 +142,8 @@ module.exports.getServiceInfo = async (req,res) => {
         ratingRounded : Math.floor(average),
         totalReviews : totalRatings,
         createdAgo : createdAgo,
-        createdAt : service.createdAt
+        createdAt : service.createdAt,
+        serviceOffers : service.serviceOffers,
       }, ratings : ratingsList}) 
     }
 
