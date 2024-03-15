@@ -15,7 +15,6 @@ const Categories = new mongoose.Schema({
     },
     name : {
         type : String, 
-        required : true,
         unique : true
     },
     image : {
@@ -29,6 +28,13 @@ const Categories = new mongoose.Schema({
         type : String, 
         required : true
     },
+    createdAt : {
+        type : Date
+    },
+    status : {
+        type : String,
+        default : "Active"
+    }
 
 })
 

@@ -56,16 +56,10 @@ const ServiceSchema = new mongoose.Schema({
             type : Array,
             default : []
         },
-        ratings: {
-            type: Array,
-            default: [
-              { stars: 5, count: 0 },
-              { stars: 4, count: 0 },
-              { stars: 3, count: 0 },
-              { stars: 2, count: 0 },
-              { stars: 1, count: 0 },
-            ]
-          }
+        status : {
+            type : {},
+            default : {status : "Active", reasons : []}
+        }
         
 })
 

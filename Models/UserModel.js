@@ -47,13 +47,17 @@ const userSchema = new mongoose.Schema({
         type : Object,
         default : null
     },
-    Status : {
-        type : String,
-        default : "Active"
+    status : {
+        type : {},
+        default : {status : "Active", reasons : []}
     },
     Role : {
         type : String,
         default : "User"
+    },
+    createdAt : {
+        type : String,
+        default: () => new Date().toISOString()
     }
 })
 

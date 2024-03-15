@@ -80,7 +80,6 @@ module.exports.addAdmin = async (req,res) => {
     }
 
     const accessToken = req.cookies.adminAccessToken
-    console.log(accessToken)
     if(!accessToken)
     {
         return res.status(401).json({ error: 'Unauthorized' });
@@ -265,22 +264,54 @@ module.exports.getAdmins = async (req,res) => {
 
 module.exports.addCategory = async (req,res) => {
     const data = req.body
-    
-    try {
-        const result = data.map(async(data)=>{
-            await category.create({name : data.name, category_code : data.category_code, parent_code : data.parent_code, 
-            image : data.image, type : data.type, subCategory_code : data.subCategory_code})
-        })
+    const accessToken = req.cookies.adminAccessToken
 
-        return res.status(200).send(result)
-    } catch (error) {
-        return res.status(400).send({error : error})
+    const addCategory = async () => {
+        try {
+            const result = data.map(async(data)=>{
+                await category.create({name : data.name, category_code : data.category_code, parent_code : data.parent_code, 
+                image : data.image, type : data.type, subCategory_code : data.subCategory_code, createdAt : data.createdAt})
+            })
+    
+            return res.status(200).send(result)
+        } catch (error) {
+            return res.status(400).send({error : error})
+        }
+    }
+    
+
+    if(!accessToken)
+    {
+        return res.status(401).json({ error: 'Unauthorized' });
+    }
+    else if(accessToken)
+    {
+        try {
+            jwt.verify(accessToken, process.env.ADMIN_SECRET_KEY, (err, user)=>{
+                // console.log(err)
+              if(err)
+              {
+                  return res.status(200).json({ error: err, message : "access token invalid" });
+              }
+              
+              addCategory(user)
+            });
+          } catch (err) {
+            
+            if (err.name === 'TokenExpiredError') {
+              
+              return res.status(401).json({ error: 'Token expired' });
+              
+            } else {
+              return res.status(403).json({ error: 'Forbidden' });
+            }
+          }
     }
 }
 
 module.exports.getCategories = async (req,res) => {
     try {
-        const result = await category.find()
+        const result = await category.find({status : "Active"})
         if(result)
         {
             return res.status(200).send(result)
@@ -293,24 +324,143 @@ module.exports.updateCategories = async (req,res) => {
     const categoryToUpdate = req.body.categoryToUpdate
     const subCategoryToUpdate = req.body.subCategoryToUpdate
     const subCategoryCode = req.body.subCategoryToUpdate[0].subCategory_code
-
-    try {
-        // Update existing category
-        const updateResult = await category.findOneAndReplace({ category_code: categoryToUpdate.category_code }, categoryToUpdate);
-
-        // Delete existing subcategories
-        const deleteResult = await category.deleteMany({ subCategory_code: subCategoryCode });
-
-        // Insert new subcategories
-        const insertResult = await category.insertMany(subCategoryToUpdate);
-
-        return res.status(200).send({ success: true, message: 'Categories updated successfully' });
-        
-    } catch (error) {
-         // Log the error for debugging
-         console.error('Error updating categories:', error);
-
-         // Return an error response
-         return res.status(500).send({ success: false, error: 'Internal Server Error' });
+    const accessToken = req.cookies.adminAccessToken
+    
+    const updateCategory = async () => {
+        try {
+            // Update existing category
+            const updateResult = await category.findOneAndReplace({ category_code: categoryToUpdate.category_code }, categoryToUpdate);
+    
+            // Delete existing subcategories
+            const deleteResult = await category.deleteMany({ subCategory_code: subCategoryCode });
+    
+            // Insert new subcategories
+            const insertResult = await category.insertMany(subCategoryToUpdate);
+    
+            return res.status(200).send({ success: true, message: 'Categories updated successfully' });
+            
+        } catch (error) {
+             // Log the error for debugging
+             console.error('Error updating categories:', error);
+    
+             // Return an error response
+             return res.status(500).send({ success: false, error: 'Internal Server Error' });
+        }
     }
+
+    if(!accessToken)
+    {
+        return res.status(401).json({ error: 'Unauthorized' });
+    }
+    else if(accessToken)
+    {
+        try {
+            jwt.verify(accessToken, process.env.ADMIN_SECRET_KEY, (err, user)=>{
+                // console.log(err)
+              if(err)
+              {
+                  return res.status(200).json({ error: err, message : "access token invalid" });
+              }
+              
+              updateCategory(user)
+            });
+          } catch (err) {
+            
+            if (err.name === 'TokenExpiredError') {
+              
+              return res.status(401).json({ error: 'Token expired' });
+              
+            } else {
+              return res.status(403).json({ error: 'Forbidden' });
+            }
+          }
+    }
+}
+
+module.exports.editFeatureOption = async (req,res) => {
+    const {category_id} = req.params
+    const isFeatured = req.body.isFeatured
+    const accessToken = req.cookies.adminAccessToken
+    const editFeatured = async () => {
+        try {
+            const result = await category.findByIdAndUpdate(category_id, {$set : {featured : isFeatured}})
+            return res.status(200).json(result)
+        } catch (error) {
+            return res.status(400).json({ error: error });
+        }
+    }
+
+    if(!accessToken)
+    {
+        return res.status(401).json({ error: 'Unauthorized' });
+    }
+    else if(accessToken)
+    {
+        try {
+            jwt.verify(accessToken, process.env.ADMIN_SECRET_KEY, (err, user)=>{
+                // console.log(err)
+              if(err)
+              {
+                  return res.status(200).json({ error: err, message : "access token invalid" });
+              }
+              
+              editFeatured(user)
+            });
+          } catch (err) {
+            
+            if (err.name === 'TokenExpiredError') {
+              
+              return res.status(401).json({ error: 'Token expired' });
+              
+            } else {
+              return res.status(403).json({ error: 'Forbidden' });
+            }
+          }
+    }
+}
+
+module.exports.deleteCategory = async (req,res) => {
+    const {category_id} = req.params
+    const accessToken = req.cookies.adminAccessToken
+    
+    const deleteCategory = async () => {
+        if(category_id)
+    {
+        try {
+            const result = await category.findByIdAndUpdate(category_id, {$set : {status : "Removed"}})
+            return res.status(200).json(result)
+        } catch (error) {
+            return res.status(400).json(error)
+        }
+    }
+    }
+
+    if(!accessToken)
+    {
+        return res.status(401).json({ error: 'Unauthorized' });
+    }
+    else if(accessToken)
+    {
+        try {
+            jwt.verify(accessToken, process.env.ADMIN_SECRET_KEY, (err, user)=>{
+                // console.log(err)
+              if(err)
+              {
+                  return res.status(200).json({ error: err, message : "access token invalid" });
+              }
+              
+              deleteCategory(user)
+            });
+          } catch (err) {
+            
+            if (err.name === 'TokenExpiredError') {
+              
+              return res.status(401).json({ error: 'Token expired' });
+              
+            } else {
+              return res.status(403).json({ error: 'Forbidden' });
+            }
+          }
+    }
+    
 }
