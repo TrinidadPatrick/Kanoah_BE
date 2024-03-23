@@ -1,8 +1,8 @@
 
 const {Router} = require('express')
-const { loginasAdmin, addAdmin, logout, checkStatus, getAdminInfo, getAdmins, refreshAdmin, addCategory, getCategories, updateCategories, editFeatureOption, deleteCategory, UpdateAdmin, DisableAdmin, EnableAdmin, UpdateSuperAdmin, AdminGetAllBookings, AdminGetAllReviews } = require('../Controllers/AdminController')
-const { Admin_GetServices, Admin_DisableService, Admin_EnableService, Admin_ViewService } = require('../Controllers/Admin_ServicesController')
-const { Admin_GetUserLists, Admin_DisableUser, Admin_EnableUser } = require('../Controllers/Admin_UsersController')
+const { loginasAdmin, addAdmin, logout, checkStatus, getAdminInfo, getAdmins, refreshAdmin, addCategory, getCategories, updateCategories, editFeatureOption, deleteCategory, UpdateAdmin, DisableAdmin, EnableAdmin, UpdateSuperAdmin, AdminGetAllBookings, AdminGetAllReviews, AdminDashboard_GetAllBookings } = require('../Controllers/AdminController')
+const { Admin_GetServices, Admin_DisableService, Admin_EnableService, Admin_ViewService, AdminDashboard_GetServices } = require('../Controllers/Admin_ServicesController')
+const { Admin_GetUserLists, Admin_DisableUser, Admin_EnableUser, AdminDashboard_GetUserLists } = require('../Controllers/Admin_UsersController')
 const { addBooking, CLIENT_getPendingBooking, respondBooking, getBookingSchedules, getPendingBooking, getAcceptedBooking, getRejectedBooking, getBookingHistory, CLIENT_getToPayBooking, CLIENT_getAcceptedBooking, CLIENT_getRejectedBooking, CLIENT_getHistoryBooking, getPendingPaymentBooking, CLIENT_getInProgressBooking, CLIENT_getCompletedBooking, CLIENT_getCancelledBooking, getInProgressBooking, getCompletedBooking, getCancelledBooking } = require('../Controllers/BookingsController')
 const { getAllChats, sendChat, getUserChats, readChat, deleteConvo } = require('../Controllers/ChatController')
 const { addToDoNotShow, getDoNotShow, removeDoNotShow } = require('../Controllers/DoNotShowController')
@@ -10,13 +10,13 @@ const { addFavorites, getFavorites, removeFavorites } = require('../Controllers/
 const { payGcash, checkPaymentStatus } = require('../Controllers/GcashController')
 const { fetchAllUsers, getReceiver, getServiceFromChat, sendMessage, retrieveContacts, getMessages, getAllMessages, handleReadMessage, viewChatMemberProfile, handleDeleteConversation, checkUnreadMessages,  } = require('../Controllers/MessageController')
 const { addNotification, getNotifications, markAsRead, countUnreadNotifs, markAllAsRead } = require('../Controllers/NotificationController')
-const { AddRating, getAllRatings, getUserRatings, getServiceRatings, removeRating, restoreRating, getServiceRatingWithFilter } = require('../Controllers/RatingController')
+const { AddRating, getAllRatings, getUserRatings, getServiceRatings, removeRating, restoreRating, getServiceRatingWithFilter, AdminDashboard_GetRatings } = require('../Controllers/RatingController')
 const { getServices, addService, getService, addGalleryImage, getGalleryImages, deleteImage, deleteMultipleImages, addFeaturedImage, getFeaturedImages, deleteFeaturedImage, deleteMultipleFeaturedImages, updateProfilePicture, getServiceInfo, getServiceProfile, updateService } = require('../Controllers/ServiceController')
 const { countBookings, countRatings, getRatingAverage, getTotalSales, getMonthlySales, getMonthlyBookings, getDBBookings, getDBServiceOffers } = require('../Controllers/ServiceDashboardController')
 const {register, verifyEmail, verifyOTP, login, forgotPassword, newPassword, submitOtpForNewPassword, verifyUsername, getUsers, getUser, updateUser, verifyPassword, updatePassword, deactivateAccount, refresh, profile, handleFb, handleFbLogin, getUserInfo, userLogout} = require('../Controllers/UserController')
 const { Mobile_GetServices, Mobile_GetServicesByFilter } = require('../MobileControllers/MobileServiceController')
 const { Mobile_login, Mobile_getUser, Mobile_updateProfile } = require('../MobileControllers/UserController')
-const { AddReport, AdminGetReports, AdminUpdateReport, AdminGetPendingReports, AdminGetReportHistory } = require('../Controllers/ReportController')
+const { AddReport, AdminGetReports, AdminUpdateReport, AdminGetPendingReports, AdminGetReportHistory, AdminGetAllReportCounts } = require('../Controllers/ReportController')
 const { AdminAddNotification } = require('../Controllers/Admin_NotificationController')
 const router = Router()
 
@@ -116,6 +116,13 @@ router.patch('/AdminUpdateReport/:_id', AdminUpdateReport)
 router.post('/AdminAddNotification', AdminAddNotification)
 router.get('/AdminGetAllBookings', AdminGetAllBookings)
 router.get('/AdminGetAllReviews', AdminGetAllReviews)
+
+// Admin Dashboard Routes
+router.get('/AdminDashboard_GetServices/:year', AdminDashboard_GetServices)
+router.get('/AdminDashboard_GetUserLists/:year', AdminDashboard_GetUserLists)
+router.get('/AdminGetAllReportCounts/:year', AdminGetAllReportCounts)
+router.get('/AdminDashboard_GetAllBookings/:year', AdminDashboard_GetAllBookings)
+router.get('/AdminDashboard_GetRatings/:year', AdminDashboard_GetRatings)
 
 // Booking Route
 router.get('/getBookingSchedules/:shop_id', getBookingSchedules)

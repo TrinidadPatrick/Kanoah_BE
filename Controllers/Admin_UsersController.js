@@ -49,6 +49,50 @@ module.exports.Admin_GetUserLists = async (req,res) => {
     }
 }
 
+module.exports.AdminDashboard_GetUserLists = async (req,res) => {
+  const accessToken = req.cookies.adminAccessToken
+  const {year} = req.params
+
+  const getUsers = async () => {
+      try {
+          const result = await users.find({
+            createdAt: { $regex: new RegExp('^' + year) }
+          }, {password : 0})
+          return res.status(200).json(result)
+      } catch (error) {
+          return res.status(400).json(error)
+      }
+  }
+
+  if(!accessToken)
+  {
+      return res.status(401).json({ error: 'Unauthorized' });
+  }
+  else if(accessToken)
+  {
+      try {
+          jwt.verify(accessToken, process.env.ADMIN_SECRET_KEY, (err, user)=>{
+              // console.log(err)
+            if(err)
+            {
+                return res.status(200).json({ error: err, message : "access token invalid" });
+            }
+            
+            getUsers()
+          });
+        } catch (err) {
+          
+          if (err.name === 'TokenExpiredError') {
+            
+            return res.status(401).json({ error: 'Token expired' });
+            
+          } else {
+            return res.status(403).json({ error: 'Forbidden' });
+          }
+        }
+  }
+}
+
 module.exports.Admin_DisableUser = async (req,res) => {
   const accessToken = req.cookies.adminAccessToken
   const {userId} = req.params

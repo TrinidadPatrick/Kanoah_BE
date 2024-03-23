@@ -21,7 +21,7 @@ const BookingSchema = new mongoose.Schema({
         type : Object
     },
     createdAt : {
-        type : Date,
+        type : String,
         required : true
     },
     service_fee : {

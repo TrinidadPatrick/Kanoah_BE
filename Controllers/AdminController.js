@@ -762,6 +762,53 @@ module.exports.AdminGetAllBookings = async (req,res) => {
   }
 }
 
+module.exports.AdminDashboard_GetAllBookings = async (req,res) => {
+  const accessToken = req.cookies.adminAccessToken
+  const {year} = req.params
+  const getBookings = async (user) => {
+      
+          try {
+              const bookingList = await bookings.find({
+                createdAt: { $regex: new RegExp('^' + year) }
+              }).populate('client', 'firstname lastname')
+              .populate('shop', 'basicInformation.ServiceTitle')
+              if(bookingList)
+              {
+                  return res.status(200).json(bookingList)
+              }
+  
+              return res.status(400).json({error : "Not Found"})
+          } catch (error) {
+              return res.status(400).json({error : error})
+          }
+  }
+
+  if(!accessToken)
+  {
+      return res.status(401).json({ error: 'Unauthorized' });
+  }
+  else if(accessToken)
+  {
+      try {
+          jwt.verify(accessToken, process.env.ADMIN_SECRET_KEY, (err, user)=>{
+            if(err)
+            {
+                return res.status(200).json({ error: 'access token expired' });
+            }
+            
+            getBookings(user)
+          });
+        } catch (err) {
+            
+          if (err.name === 'TokenExpiredError') {
+            return res.status(401).json({ error: 'Token expired' });
+          } else {
+            return res.status(403).json({ error: 'Forbidden' });
+          }
+        }
+  }
+}
+
 module.exports.AdminGetAllReviews = async (req,res) => {
   const accessToken = req.cookies.adminAccessToken
 

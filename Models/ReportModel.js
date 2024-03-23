@@ -14,7 +14,7 @@ const reports = new mongoose.Schema({
         type : String,
     },
     createdAt : {
-        type : Date
+        type : String
     },
     status : {
         default : "Pending",

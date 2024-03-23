@@ -123,6 +123,52 @@ module.exports.AdminGetReportHistory = async (req,res) => {
       }
     }
 }
+module.exports.AdminGetAllReportCounts = async (req,res) => {
+  const accessToken = req.cookies.adminAccessToken
+  const {year} = req.params
+
+
+  const getReportHistory = async (user) => {
+      if(user.Role === "SuperAdmin" || user.Role === "Admin")
+      {
+          try {
+              const result = await reports.find({
+                createdAt: { $regex: new RegExp('^' + year) }
+              })
+              if(result)
+              {
+                  return res.status(200).json(result)
+              }
+          } catch (error) {
+              return res.status(400).json(error);
+          }
+      }
+      return res.status(401).json({ error: 'Unauthorized' });
+  }
+
+  if (!accessToken) {
+      return res.status(401).json({ error: 'Unauthorized' });
+    }
+  
+    try {
+      jwt.verify(accessToken, process.env.ADMIN_SECRET_KEY, (err, user)=>{
+        if(err)
+        {
+            return res.status(403).json({ error: 'Forbidden' });
+        }
+        
+        getReportHistory(user);
+      });
+    } catch (err) {
+        
+      if (err.name === 'TokenExpiredError') {
+        return res.status(401).json({ error: 'Token expired' });
+      } else {
+      
+        return res.status(403).json({ error: 'Forbidden' });
+      }
+    }
+}
 
 module.exports.AdminUpdateReport = async (req,res) => {
     const accessToken = req.cookies.adminAccessToken

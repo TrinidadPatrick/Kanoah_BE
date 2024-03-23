@@ -8,7 +8,6 @@ require("dotenv").config();
 
 module.exports.Admin_GetServices = async (req,res) => {
     const accessToken = req.cookies.adminAccessToken
-
     const getServices = async () => {
         try {
             const result = await services.find().populate('owner', 'firstname lastname profileImage')
@@ -42,6 +41,47 @@ module.exports.Admin_GetServices = async (req,res) => {
             }
           }
     }
+}
+
+module.exports.AdminDashboard_GetServices = async (req,res) => {
+  const accessToken = req.cookies.adminAccessToken
+  const {year} = req.params
+
+  const getServices = async () => {
+      try {
+          const result = await services.find({
+            createdAt: { $regex: new RegExp('^' + year) }
+          }).populate('owner', 'firstname lastname profileImage')
+          return res.status(200).json(result)
+      } catch (error) {
+          return res.status(400).json(error)
+      }
+  }
+
+  if(!accessToken)
+  {
+      return res.status(401).json({ error: 'Unauthorized' });
+  }
+  else if(accessToken)
+  {
+      try {
+          jwt.verify(accessToken, process.env.ADMIN_SECRET_KEY, (err, user)=>{
+            if(err)
+            {
+                return res.status(200).json({ error: 'access token expired' });
+            }
+            
+            getServices(user)
+          });
+        } catch (err) {
+            
+          if (err.name === 'TokenExpiredError') {
+            return res.status(401).json({ error: 'Token expired' });
+          } else {
+            return res.status(403).json({ error: 'Forbidden' });
+          }
+        }
+  }
 }
 
 // Gets the service information from the view service admin page

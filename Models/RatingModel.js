@@ -19,7 +19,7 @@ const RatingSchema = mongoose.Schema({
         required : true
     },
     createdAt : {
-        type: Date, 
+        type: String, 
         required : true
     },
     status : {
