@@ -56,7 +56,7 @@ module.exports.Admin_DisableUser = async (req,res) => {
 
   const disableUser = async () => {
     try {
-      const result = await users.findByIdAndUpdate(userId, { $set: { 'status.status' : "Disabled", 'status.reasons': data.reason } } )
+      const result = await users.findByIdAndUpdate(userId, { $set: { 'status.status' : "Disabled", 'status.reasons': data.reason, 'status.dateDisabled' : new Date() } } )
       return res.status(200).json(result.data)
     } catch (error) {
       return res.status(400).json(error)

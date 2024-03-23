@@ -85,6 +85,7 @@ module.exports.Admin_ViewService = async (req,res) => {
       createdAgo : createdAgo,
       createdAt : service.createdAt,
       serviceOffers : service.serviceOffers,
+      status : service.status
     }, ratings : ratingsList}) 
   }
 
@@ -131,7 +132,7 @@ module.exports.Admin_DisableService = async (req,res) => {
 
   const disableService = async () => {
     try {
-      const result = await services.findByIdAndUpdate(serviceId, { $set: { 'status.status' : "Disabled", 'status.reasons': data.reason } } )
+      const result = await services.findByIdAndUpdate(serviceId, { $set: { 'status.status' : "Disabled", 'status.reasons': data.reason, 'status.dateDisabled' : new Date() } } )
       return res.status(200).json(result.data)
     } catch (error) {
       return res.status(400).json(error)

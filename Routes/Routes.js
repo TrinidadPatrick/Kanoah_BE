@@ -1,6 +1,6 @@
 
 const {Router} = require('express')
-const { loginasAdmin, addAdmin, logout, checkStatus, getAdminInfo, getAdmins, refreshAdmin, addCategory, getCategories, updateCategories, editFeatureOption, deleteCategory } = require('../Controllers/AdminController')
+const { loginasAdmin, addAdmin, logout, checkStatus, getAdminInfo, getAdmins, refreshAdmin, addCategory, getCategories, updateCategories, editFeatureOption, deleteCategory, UpdateAdmin, DisableAdmin, EnableAdmin, UpdateSuperAdmin, AdminGetAllBookings, AdminGetAllReviews } = require('../Controllers/AdminController')
 const { Admin_GetServices, Admin_DisableService, Admin_EnableService, Admin_ViewService } = require('../Controllers/Admin_ServicesController')
 const { Admin_GetUserLists, Admin_DisableUser, Admin_EnableUser } = require('../Controllers/Admin_UsersController')
 const { addBooking, CLIENT_getPendingBooking, respondBooking, getBookingSchedules, getPendingBooking, getAcceptedBooking, getRejectedBooking, getBookingHistory, CLIENT_getToPayBooking, CLIENT_getAcceptedBooking, CLIENT_getRejectedBooking, CLIENT_getHistoryBooking, getPendingPaymentBooking, CLIENT_getInProgressBooking, CLIENT_getCompletedBooking, CLIENT_getCancelledBooking, getInProgressBooking, getCompletedBooking, getCancelledBooking } = require('../Controllers/BookingsController')
@@ -16,6 +16,8 @@ const { countBookings, countRatings, getRatingAverage, getTotalSales, getMonthly
 const {register, verifyEmail, verifyOTP, login, forgotPassword, newPassword, submitOtpForNewPassword, verifyUsername, getUsers, getUser, updateUser, verifyPassword, updatePassword, deactivateAccount, refresh, profile, handleFb, handleFbLogin, getUserInfo, userLogout} = require('../Controllers/UserController')
 const { Mobile_GetServices, Mobile_GetServicesByFilter } = require('../MobileControllers/MobileServiceController')
 const { Mobile_login, Mobile_getUser, Mobile_updateProfile } = require('../MobileControllers/UserController')
+const { AddReport, AdminGetReports, AdminUpdateReport, AdminGetPendingReports, AdminGetReportHistory } = require('../Controllers/ReportController')
+const { AdminAddNotification } = require('../Controllers/Admin_NotificationController')
 const router = Router()
 
 // User Routes
@@ -87,6 +89,10 @@ router.get('/checkUnreadMessages', checkUnreadMessages)
 // admin Route
 router.post('/loginasAdmin', loginasAdmin)
 router.post('/addAdmin', addAdmin)
+router.patch('/UpdateAdmin/:_id', UpdateAdmin)
+router.patch('/DisableAdmin/:_id', DisableAdmin)
+router.patch('/EnableAdmin/:_id', EnableAdmin)
+router.patch('/UpdateSuperAdmin', UpdateSuperAdmin)
 router.get('/logout', logout)
 router.get('/checkStatus', checkStatus)
 router.get('/refreshAdmin', refreshAdmin)
@@ -104,6 +110,12 @@ router.get('/Admin_ViewService/:_id', Admin_ViewService)
 router.get('/Admin_GetUserLists', Admin_GetUserLists)
 router.patch('/Admin_DisableUser/:userId', Admin_DisableUser)
 router.patch('/Admin_EnableUser/:userId', Admin_EnableUser)
+router.get('/AdminGetPendingReports', AdminGetPendingReports)
+router.get('/AdminGetReportHistory', AdminGetReportHistory)
+router.patch('/AdminUpdateReport/:_id', AdminUpdateReport)
+router.post('/AdminAddNotification', AdminAddNotification)
+router.get('/AdminGetAllBookings', AdminGetAllBookings)
+router.get('/AdminGetAllReviews', AdminGetAllReviews)
 
 // Booking Route
 router.get('/getBookingSchedules/:shop_id', getBookingSchedules)
@@ -159,6 +171,9 @@ router.get('/getMonthlySales', getMonthlySales)
 router.get('/getMonthlyBookings', getMonthlyBookings)
 router.get('/getDBBookings', getDBBookings)
 router.get('/getDBServiceOffers', getDBServiceOffers)
+
+// Report Routes
+router.post('/AddReport', AddReport)
 
 // MOBILE ROUTESS
 

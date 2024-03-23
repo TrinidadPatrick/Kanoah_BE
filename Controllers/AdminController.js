@@ -1,5 +1,7 @@
 const admins = require('../Models/AdminModel')
 const category = require("../Models/CategoryModel")
+const ratings = require("../Models/RatingModel")
+const bookings = require("../Models/BookingModel")
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
 require("dotenv").config();
@@ -107,6 +109,180 @@ module.exports.addAdmin = async (req,res) => {
             }
           }
     }
+}
+
+module.exports.UpdateAdmin = async (req,res) => {
+  const accessToken = req.cookies.adminAccessToken
+  const body = req.body.adminInfo
+  const superAdminPassword = req.body.superAdminPassword
+  const {_id} = req.params
+
+  const updateAdmin= async (userId) => {
+
+    try {
+
+      const verifyPassword = await admins.findById(userId)
+      if(verifyPassword) //IF the superadmin account is found
+      {
+        const comparePassword = await bcrypt.compare(superAdminPassword, verifyPassword.password) //compares the password
+        if(comparePassword) // if superAdmin password is correct
+        {
+          if(body.password === "")
+          {
+            const result = await admins.findByIdAndUpdate(_id, { $set : {
+              username : body.username,
+              firstname : body.firstname, 
+              lastname : body.lastname,
+              email : body.email
+            }})
+            return res.status(200).json(result)
+          }
+          const hashedPassword = await bcrypt.hash(body.password, 10)
+          const result = await admins.findByIdAndUpdate(_id, { $set : {
+            username : body.username,
+            firstname : body.firstname, 
+            lastname : body.lastname,
+            email : body.email,
+            password : hashedPassword
+          }})
+          return res.status(200).json(result)
+        }
+        return res.status(400).json({message : "Incorrect Password"})
+      }
+      return res.status(404).json({message : "Account not found"})
+
+        
+      
+      
+      
+    } catch (error) {
+      return res.status(400).json(error)
+    }
+  }
+
+  if(!accessToken)
+    {
+        return res.status(401).json({ error: 'Unauthorized' });
+    }
+    else if(accessToken)
+    {
+        try {
+            jwt.verify(accessToken, process.env.ADMIN_SECRET_KEY, (err, user)=>{
+                // console.log(err)
+              if(err)
+              {
+                  return res.status(200).json({ error: err, message : "access token invalid" });
+              }
+              
+              updateAdmin(user._id)
+            });
+          } catch (err) {
+            
+            if (err.name === 'TokenExpiredError') {
+              
+              return res.status(401).json({ error: 'Token expired' });
+              
+            } else {
+              return res.status(403).json({ error: 'Forbidden' });
+            }
+          }
+    }
+  
+  
+}
+
+module.exports.DisableAdmin = async (req,res) => {
+  const accessToken = req.cookies.adminAccessToken
+  const {_id} = req.params
+
+  const disableAdmin = async () => {
+    try {
+      const result = await admins.findByIdAndUpdate(_id, { $set : {status : "Disabled"}})
+      if(result)
+      {
+        return res.status(200).json({message : "Disable successfull"})
+      }
+      return res.status(404).json({message : "Not Found"})
+    } catch (error) {
+      return res.status(400).json(error)
+    }
+  }
+
+  if(!accessToken)
+  {
+      return res.status(401).json({ error: 'Unauthorized' });
+  }
+  else if(accessToken)
+  {
+      try {
+          jwt.verify(accessToken, process.env.ADMIN_SECRET_KEY, (err, user)=>{
+              // console.log(err)
+            if(err)
+            {
+                return res.status(200).json({ error: err, message : "access token invalid" });
+            }
+            
+            disableAdmin()
+          });
+        } catch (err) {
+          
+          if (err.name === 'TokenExpiredError') {
+            
+            return res.status(401).json({ error: 'Token expired' });
+            
+          } else {
+            return res.status(403).json({ error: 'Forbidden' });
+          }
+        }
+  }
+
+}
+
+module.exports.EnableAdmin = async (req,res) => {
+  const accessToken = req.cookies.adminAccessToken
+  const {_id} = req.params
+
+  const enableAdmin = async () => {
+    try {
+      const result = await admins.findByIdAndUpdate(_id, { $set : {status : "Active"}})
+      if(result)
+      {
+        return res.status(200).json({message : "Disable successfull"})
+      }
+      return res.status(404).json({message : "Not Found"})
+    } catch (error) {
+      return res.status(400).json(error)
+    }
+  }
+
+  if(!accessToken)
+  {
+      return res.status(401).json({ error: 'Unauthorized' });
+  }
+  else if(accessToken)
+  {
+      try {
+          jwt.verify(accessToken, process.env.ADMIN_SECRET_KEY, (err, user)=>{
+              // console.log(err)
+            if(err)
+            {
+                return res.status(200).json({ error: err, message : "access token invalid" });
+            }
+            
+            enableAdmin()
+          });
+        } catch (err) {
+          
+          if (err.name === 'TokenExpiredError') {
+            
+            return res.status(401).json({ error: 'Token expired' });
+            
+          } else {
+            return res.status(403).json({ error: 'Forbidden' });
+          }
+        }
+  }
+
 }
  
 module.exports.checkStatus = async (req,res) => {
@@ -220,7 +396,7 @@ module.exports.getAdmins = async (req,res) => {
         if(user.Role === "SuperAdmin")
         {
             try {
-                const adminList = await admins.find({Role : "Admin"})
+                const adminList = await admins.find({Role : "Admin"},  {password : 0})
                 if(adminList)
                 {
                     return res.status(200).json({adminList})
@@ -463,4 +639,170 @@ module.exports.deleteCategory = async (req,res) => {
           }
     }
     
+}
+
+module.exports.UpdateSuperAdmin = async (req,res) => {
+  const accessToken = req.cookies.adminAccessToken
+  const data = req.body
+
+
+  const updateSuperAdmin = async (user) => {
+    if(user.Role === "SuperAdmin")
+    {
+      try {
+        const superAdmin = await admins.findOne({_id : user._id, Role : "SuperAdmin"}) //Find first the super admin
+        if(superAdmin)
+        {
+          console.log(superAdmin)
+          const comparePassword = await bcrypt.compare(data.SAPassword, superAdmin.password) //Validate the password of sa SA to the input in the FE
+          if(comparePassword)
+          {
+            if(data.password === "") //If not password was input in the FE
+            {
+            const result = await admins.findByIdAndUpdate(user._id, {
+                  $set : {
+                        firstname : data.firstname,
+                        lastname : data.lastname,
+                  }
+                  })
+              return res.status(200).json({message : "Update success"})
+            }
+            const hashedPassword = await bcrypt.hash(data.password, 10)
+            const result = await admins.findByIdAndUpdate(user._id, { // If there us a password input in the FE
+              $set : {
+                    firstname : data.firstname,
+                    lastname : data.lastname,
+                    password : hashedPassword
+              }
+              })
+          return res.status(200).json({message : "Update success"})
+          }
+          return res.status(401).json({ error: 'Password incorrect' });
+        }
+        return res.status(404).json({ error: "Account not found" });
+        
+      } catch (error) {
+        return res.status(400).json({ error: error });
+      }
+    }
+    return res.status(401).json({ error: 'Unauthorized' });
+  }
+
+  if(!accessToken)
+    {
+        return res.status(401).json({ error: 'Unauthorized' });
+    }
+    else if(accessToken)
+    {
+        try {
+            jwt.verify(accessToken, process.env.ADMIN_SECRET_KEY, (err, user)=>{
+                // console.log(err)
+              if(err)
+              {
+                  return res.status(200).json({ error: err, message : "access token invalid" });
+              }
+              
+              updateSuperAdmin(user)
+            });
+          } catch (err) {
+            
+            if (err.name === 'TokenExpiredError') {
+              
+              return res.status(401).json({ error: 'Token expired' });
+              
+            } else {
+              return res.status(403).json({ error: 'Forbidden' });
+            }
+          }
+    }
+}
+
+module.exports.AdminGetAllBookings = async (req,res) => {
+  const accessToken = req.cookies.adminAccessToken
+
+  const getBookings = async (user) => {
+      
+          try {
+              const bookingList = await bookings.find().populate('client', 'firstname lastname')
+              .populate('shop', 'basicInformation.ServiceTitle')
+              if(bookingList)
+              {
+                  return res.status(200).json(bookingList)
+              }
+  
+              return res.status(400).json({error : "Not Found"})
+          } catch (error) {
+              return res.status(400).json({error : error})
+          }
+  }
+
+  if(!accessToken)
+  {
+      return res.status(401).json({ error: 'Unauthorized' });
+  }
+  else if(accessToken)
+  {
+      try {
+          jwt.verify(accessToken, process.env.ADMIN_SECRET_KEY, (err, user)=>{
+            if(err)
+            {
+                return res.status(200).json({ error: 'access token expired' });
+            }
+            
+            getBookings(user)
+          });
+        } catch (err) {
+            
+          if (err.name === 'TokenExpiredError') {
+            return res.status(401).json({ error: 'Token expired' });
+          } else {
+            return res.status(403).json({ error: 'Forbidden' });
+          }
+        }
+  }
+}
+
+module.exports.AdminGetAllReviews = async (req,res) => {
+  const accessToken = req.cookies.adminAccessToken
+
+  const getReviews = async (user) => {
+      
+          try {
+              const reviewList = await ratings.find().populate('service', 'basicInformation.ServiceTitle ').populate('user', 'firstname lastname')
+              .populate('booking', 'service')
+              if(reviewList)
+              {
+                  return res.status(200).json(reviewList)
+              }
+  
+              return res.status(400).json({error : "Not Found"})
+          } catch (error) {
+              return res.status(400).json({error : error})
+          }
+  }
+
+  if(!accessToken)
+  {
+      return res.status(401).json({ error: 'Unauthorized' });
+  }
+  else if(accessToken)
+  {
+      try {
+          jwt.verify(accessToken, process.env.ADMIN_SECRET_KEY, (err, user)=>{
+            if(err)
+            {
+                return res.status(200).json({ error: 'access token expired' });
+            }
+            
+            getReviews(user)
+          });
+        } catch (err) {
+            
+          if (err.name === 'TokenExpiredError') {
+            return res.status(401).json({ error: 'Token expired' });
+          } else {
+            return res.status(403).json({ error: 'Forbidden' });
+          }
+        }
+  }
 }

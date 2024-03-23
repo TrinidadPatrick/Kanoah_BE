@@ -21,7 +21,6 @@ const notificationSchema = mongoose.Schema({
     },
     client : {
         type : mongoose.Schema.Types.ObjectId, ref: 'User_Info',
-        required : true
     },
     notif_to : {
         type : mongoose.Schema.Types.ObjectId, ref: 'User_Info',

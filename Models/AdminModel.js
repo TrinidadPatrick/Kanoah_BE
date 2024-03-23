@@ -33,6 +33,10 @@ const admins = new mongoose.Schema(
         createdAt : {
             type : String
         },
+        status : {
+            type : String,
+            default : "Active"
+        }
 
 
     }
