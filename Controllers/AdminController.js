@@ -41,8 +41,8 @@ module.exports.loginasAdmin = async (req,res) => {
 }
 
 module.exports.logout = async (req,res) => {
-    res.clearCookie('adminAccessToken', { httpOnly: true });
-    res.clearCookie('adminRefreshToken', { httpOnly: true });
+    res.cookie('adminAccessToken', null, {secure: true , httpOnly: true , sameSite: 'None',maxAge: -1  });   
+    res.cookie('adminRefreshToken', null, {secure: true , httpOnly: true , sameSite: 'None',maxAge: -1  });   
     return res.status(200).send({message : 'success'})
 }
 
