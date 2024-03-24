@@ -26,9 +26,9 @@ module.exports.payGcash = async (req,res) => {
       data
   })
   
-  console.log(response)
   res.send(response)
   } catch (error) {
+    console.log(error)
     return res.status(500).json(error)
   }
 
