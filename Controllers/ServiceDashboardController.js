@@ -15,16 +15,16 @@ module.exports.countBookings = async (req,res) => {
             const thisMonth = await bookings.countDocuments({
                 shop: service,
                 createdAt: dateFilter ? {
-                  $gte: new Date(dateFilter + "-01"),
-                  $lt: new Date(new Date(dateFilter + "-01").setMonth(new Date(dateFilter + "-01").getMonth() + 1))
+                  $gte: new Date(dateFilter + "-01").toISOString(),
+                  $lt: new Date(new Date(dateFilter + "-01").setMonth(new Date(dateFilter + "-01").getMonth() + 1)).toISOString()
                 } : null
               })
 
                // Calculate the start date of the previous month
-               const prevMonthStart = new Date(new Date(dateFilter + "-01").setMonth(new Date(dateFilter + "-01").getMonth() - 1));
+               const prevMonthStart = new Date(new Date(dateFilter + "-01").setMonth(new Date(dateFilter + "-01").getMonth() - 1)).toISOString()
 
                // Calculate the end date of the previous month
-               const prevMonthEnd = new Date(dateFilter + "-01");
+               const prevMonthEnd = new Date(dateFilter + "-01").toISOString()
 
                const prevMonth = await ratings.countDocuments({
                    service: service,
@@ -77,16 +77,16 @@ module.exports.countRatings = async (req,res) => {
             const thisMonth = await ratings.countDocuments({
                 service: service,
                 createdAt: dateFilter ? {
-                  $gte: new Date(dateFilter + "-01"),
-                  $lt: new Date(new Date(dateFilter + "-01").setMonth(new Date(dateFilter + "-01").getMonth() + 1))
+                  $gte: new Date(dateFilter + "-01").toISOString(),
+                  $lt: new Date(new Date(dateFilter + "-01").setMonth(new Date(dateFilter + "-01").getMonth() + 1)).toISOString()
                 } : null
               })
 
                // Calculate the start date of the previous month
-                const prevMonthStart = new Date(new Date(dateFilter + "-01").setMonth(new Date(dateFilter + "-01").getMonth() - 1));
+                const prevMonthStart = new Date(new Date(dateFilter + "-01").setMonth(new Date(dateFilter + "-01").getMonth() - 1)).toISOString()
 
                 // Calculate the end date of the previous month
-                const prevMonthEnd = new Date(dateFilter + "-01");
+                const prevMonthEnd = new Date(dateFilter + "-01").toISOString()
 
                 const prevMonth = await ratings.countDocuments({
                     service: service,
@@ -137,19 +137,19 @@ module.exports.getRatingAverage = async (req,res) => {
             const thisMonth = await ratings.find({
                 service: service,
                 createdAt: dateFilter ? {
-                  $gte: new Date(dateFilter + "-01"),
-                  $lt: new Date(new Date(dateFilter + "-01").setMonth(new Date(dateFilter + "-01").getMonth() + 1))
+                  $gte: new Date(dateFilter + "-01").toISOString(),
+                  $lt: new Date(new Date(dateFilter + "-01").setMonth(new Date(dateFilter + "-01").getMonth() + 1)).toISOString()
                 } : null
             })
             const totalRatings = thisMonth.length
-            const sumOfRatings = thisMonth.reduce((sum, rating) => sum + rating.rating, 0);
+            const sumOfRatings = thisMonth.reduce((sum, rating) => sum + rating.rating, 0)
             const average = totalRatings === 0 ? 0 : sumOfRatings / totalRatings
 
             // Calculate the start date of the previous month
-            const prevMonthStart = new Date(new Date(dateFilter + "-01").setMonth(new Date(dateFilter + "-01").getMonth() - 1));
+            const prevMonthStart = new Date(new Date(dateFilter + "-01").setMonth(new Date(dateFilter + "-01").getMonth() - 1)).toISOString()
 
             // Calculate the end date of the previous month
-            const prevMonthEnd = new Date(dateFilter + "-01");
+            const prevMonthEnd = new Date(dateFilter + "-01").toISOString()
 
             const prevMonth = await ratings.find({
                 service: service,
@@ -206,17 +206,17 @@ module.exports.getTotalSales = async (req,res) => {
             const thisMonth = await bookings.find({
                 shop : service,
                 createdAt: dateFilter ? {
-                  $gte: new Date(dateFilter + "-01"),
-                  $lt: new Date(new Date(dateFilter + "-01").setMonth(new Date(dateFilter + "-01").getMonth() + 1))
+                  $gte: new Date(dateFilter + "-01").toISOString(),
+                  $lt: new Date(new Date(dateFilter + "-01").setMonth(new Date(dateFilter + "-01").getMonth() + 1)).toISOString()
                 } : null
             })
             const sales = thisMonth.reduce((sum, booking) => sum + Number(booking.service.price), 0)
 
             // Calculate the start date of the previous month
-            const prevMonthStart = new Date(new Date(dateFilter + "-01").setMonth(new Date(dateFilter + "-01").getMonth() - 1));
+            const prevMonthStart = new Date(new Date(dateFilter + "-01").setMonth(new Date(dateFilter + "-01").getMonth() - 1)).toISOString()
 
             // Calculate the end date of the previous month
-            const prevMonthEnd = new Date(dateFilter + "-01");
+            const prevMonthEnd = new Date(dateFilter + "-01").toISOString()
 
             const prevMonth = await bookings.find({
                 shop: service,
@@ -361,8 +361,8 @@ module.exports.getDBBookings = async (req,res) => {
                 const result = await bookings.find({
                     shop : service,
                     createdAt: dateFilter ? {
-                        $gte: new Date(dateFilter + "-01"),
-                        $lt: new Date(new Date(dateFilter + "-01").setMonth(new Date(dateFilter + "-01").getMonth() + 1))
+                        $gte: new Date(dateFilter + "-01").toISOString(),
+                        $lt: new Date(new Date(dateFilter + "-01").setMonth(new Date(dateFilter + "-01").getMonth() + 1)).toISOString()
                       } : null
                 }).populate('client', 'firstname lastname')
 
@@ -374,8 +374,8 @@ module.exports.getDBBookings = async (req,res) => {
                     shop : service,
                     status : filterValue,
                     createdAt: dateFilter ? {
-                        $gte: new Date(dateFilter + "-01"),
-                        $lt: new Date(new Date(dateFilter + "-01").setMonth(new Date(dateFilter + "-01").getMonth() + 1))
+                        $gte: new Date(dateFilter + "-01").toISOString(),
+                        $lt: new Date(new Date(dateFilter + "-01").setMonth(new Date(dateFilter + "-01").getMonth() + 1)).toISOString()
                       } : null
                 }).populate('client', 'firstname lastname')
                 return res.status(200).json(result)
@@ -421,8 +421,8 @@ module.exports.getDBServiceOffers = async (req,res) => {
             const serviceOffers = await Service.findById(service).select('serviceOffers')
             const bookingResult = await bookings.find({shop : service,
                 createdAt: dateFilter ? {
-                    $gte: new Date(dateFilter + "-01"),
-                    $lt: new Date(new Date(dateFilter + "-01").setMonth(new Date(dateFilter + "-01").getMonth() + 1))
+                    $gte: new Date(dateFilter + "-01").toISOString(),
+                    $lt: new Date(new Date(dateFilter + "-01").setMonth(new Date(dateFilter + "-01").getMonth() + 1)).toISOString()
                   } : null
             }).select('service')
             return res.status(200).json({serviceOffers, bookingResult})

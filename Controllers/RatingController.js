@@ -150,16 +150,19 @@ module.exports.getServiceRatingWithFilter = async (req,res) => {
   const accessToken = req.cookies.accessToken
   const dateFilter = req.query.dateFilter
   const service = req.query.service
+  
+
+  console.log(new Date(new Date(dateFilter + "-01").setMonth(new Date(dateFilter + "-01").getMonth() + 1)).toISOString())
   const getServiceRatings = async () => {
       try {
         const result = await ratings.find({
           service: service,
           createdAt: dateFilter ? {
-            $gte: new Date(dateFilter + "-01"),
-            $lt: new Date(new Date(dateFilter + "-01").setMonth(new Date(dateFilter + "-01").getMonth() + 1))
+              $gte: new Date(dateFilter + "-01").toISOString(),
+              $lt: new Date(new Date(dateFilter + "-01").setMonth(new Date(dateFilter + "-01").getMonth() + 1)).toISOString()
           } : null
-        }).populate('user', 'firstname lastname profileImage')
-          .populate('booking', 'service');
+      }).populate('user', 'firstname lastname profileImage')
+        .populate('booking', 'service');
           if (result) {
               return res.status(200).json(result);
           }
