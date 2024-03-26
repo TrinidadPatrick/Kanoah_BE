@@ -186,7 +186,7 @@ module.exports.register = async (req,res) => {
         await user.create({username, email : email.toLowerCase(), password : hashedPassword, firstname, lastname, contact, birthDate : birthDate, profileImage : image, verified : true, Address : null}).then((response)=>{
             const accessToken = generateToken({username : username, email : email.toLowerCase(), _id : response._id})
 
-            res.json({message : "Registration completed Successfully" , status : "registered", accessToken : accessToken, refreshToken : refreshToken})
+            res.status(200).json({message : "Registration completed Successfully" , status : "registered", accessToken : accessToken})
         }).catch((err)=>{
             res.send(err)
         })
@@ -240,7 +240,7 @@ module.exports.deactivateAccount = async (req,res)=> {
         if(verifyPassword)
         {
             try {
-                await user.findOneAndUpdate({_id : id}, {Status : "Deactivated"})
+                await user.findOneAndUpdate({_id : id}, {isDeactivated : true})
                 return res.json({status : "Deactivated"})
             } catch (error) {
                 return res.json({error : error, message : "Connection error, please try again later."})
@@ -314,7 +314,6 @@ module.exports.verifyEmail = async (req,res) => {
 // OTP VERIFICATION
 module.exports.verifyOTP = async (req,res) => {
     const otp = req.body.otp
-    console.log(otp, code)
     if(otp == code){
         res.json({status : "verified"})
         code = ''
@@ -329,8 +328,12 @@ module.exports.login = async (req,res) => {
     const UsernameOrEmail = req.body.UsernameOrEmail
     const password = req.body.password
 
-    const result = await user.findOne({ $or : [{username : UsernameOrEmail}, {email : UsernameOrEmail.toLowerCase()} ] })
+    const result = await user.findOne({ $or : [{username : UsernameOrEmail}, {email : UsernameOrEmail.toLowerCase()}] })
     if(result != null){
+        if(result.isDeactivated)
+        {
+            return res.status(404).json({ status: 'account not found' });
+        }
         const comparePassword = await bcrypt.compare(password, result.password)
         if(comparePassword){
             const accessToken = generateToken({ _id : result._id})

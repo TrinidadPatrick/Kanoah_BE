@@ -58,6 +58,10 @@ const userSchema = new mongoose.Schema({
     createdAt : {
         type : String,
         default: () => new Date().toISOString()
+    },
+    isDeactivated : {
+        type : Boolean,
+        default : false
     }
 })
 
