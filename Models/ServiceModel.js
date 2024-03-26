@@ -59,6 +59,10 @@ const ServiceSchema = new mongoose.Schema({
         status : {
             type : {},
             default : {status : "Active", reasons : []}
+        },
+        booking_limit : {
+            type : Number,
+            default : 1
         }
         
 })

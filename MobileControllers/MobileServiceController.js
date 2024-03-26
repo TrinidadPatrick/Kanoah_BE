@@ -131,6 +131,28 @@ module.exports.Mobile_GetServicesByFilter = async (req,res) => {
       if(ratingsFilter.length === 0)
       {
         try {
+          if(latitude == 0 && longitude == 0) //If the user didnt specify or turn on gps
+          {
+            const services = await Service.find({
+              'advanceInformation.ServiceCategory': categoryId !== '' ? categoryId : {$exists: true},
+              'advanceInformation.ServiceSubCategory': subCategoryId !== '' ? subCategoryId : {$exists: true},
+              $or: [
+                {
+                  'basicInformation.ServiceTitle': {
+                    $regex: new RegExp(searchValue.toLowerCase(), 'i')
+                  }
+                },
+                {
+                  tags: {
+                    $regex: new RegExp(searchValue.toLowerCase(), 'i')
+                  }
+                },
+                { 'basicInformation.ServiceTitle': searchValue === '' ? {$exists: true} : null }
+              ]
+            });  
+            const computed = await computeRatings(services)
+            return res.json({services : computed})
+          }
           const services = await Service.find({
             'advanceInformation.ServiceCategory': categoryId !== '' ? categoryId : {$exists: true},
             'advanceInformation.ServiceSubCategory': subCategoryId !== '' ? subCategoryId : {$exists: true},
@@ -156,8 +178,9 @@ module.exports.Mobile_GetServicesByFilter = async (req,res) => {
               { 'basicInformation.ServiceTitle': searchValue === '' ? {$exists: true} : null }
             ]
           });  
-          // console.log(services)
+          console.log(services)
           const computed = await computeRatings(services)
+          
           return res.json({services : computed})
         } catch (error) {
           return error;
@@ -166,6 +189,32 @@ module.exports.Mobile_GetServicesByFilter = async (req,res) => {
       else
       {
         try {
+          if(latitude == 0 && longitude == 0)
+          {
+            const services = await Service.find({
+              'advanceInformation.ServiceCategory': categoryId !== '' ? categoryId : {$exists: true},
+              'advanceInformation.ServiceSubCategory': subCategoryId !== '' ? subCategoryId : {$exists: true},
+              'address.latitude' : {
+                $gte: lat - (Number(radius) / 111), // Latitude range for approximately 1km in degrees
+                $lte: lat + (Number(radius) / 111),
+              } ,
+              'address.longitude':  {
+                $gte: lon - (Number(radius) / (111 * Math.cos(lat * (Math.PI / 180)))), // Longitude range adjusted for latitude
+                $lte: lon + (Number(radius) / (111 * Math.cos(lat * (Math.PI / 180)))),
+              },
+              $or: [
+                {
+                  'basicInformation.ServiceTitle': {
+                    $regex: new RegExp(searchValue.toLowerCase(), 'i')
+                  }
+                },
+                { 'basicInformation.ServiceTitle': searchValue === '' ? {$exists: true} : null }
+              ]
+            });  
+            const computed = await computeRatings(services)
+            const filtered = computed.filter((service) => ratingsFilter.some((ratings) => Number(service.ratings) >= Number(ratings) && Number(service.ratings)  < Number(ratings) + 1))
+            return res.json({services : filtered})
+          }
           const services = await Service.find({
             'advanceInformation.ServiceCategory': categoryId !== '' ? categoryId : {$exists: true},
             'advanceInformation.ServiceSubCategory': subCategoryId !== '' ? subCategoryId : {$exists: true},
@@ -181,6 +230,7 @@ module.exports.Mobile_GetServicesByFilter = async (req,res) => {
           const computed = await computeRatings(services)
           const filtered = computed.filter((service) => ratingsFilter.some((ratings) => Number(service.ratings) >= Number(ratings) && Number(service.ratings)  < Number(ratings) + 1))
           return res.json({services : filtered})
+          
         } catch (error) {
           return error;
         }
