@@ -13,6 +13,45 @@ module.exports.getServices = async (req,res) =>{
   // If User is loggedout
   if(accessToken == undefined)
   {
+    const ratingAverage = (services, ratings) => {
+      const processedServices = 
+          services.map((service, index) => {
+            const currentDate = new Date();
+            const thisDate = currentDate.toISOString().split('T')[0];
+            const serviceRatings = ratings.filter((rating) => rating.service.toString() === service._id.toString());
+            const totalRatings = serviceRatings.length;
+            const sumOfRatings = serviceRatings.reduce((sum, rating) => sum + rating.rating, 0);
+            const average = totalRatings === 0 ? 0 : sumOfRatings / totalRatings;
+            const from = new Date(service.createdAt);
+            const timeDifference = currentDate - from;
+            const seconds = Math.floor(timeDifference / 1000);
+            const minutes = Math.floor(seconds / 60);
+            const hours = Math.floor(minutes / 60);
+            const days = Math.floor(hours / 24);
+            const months = Math.floor(days / 30);
+            const years = Math.floor(months / 12);
+            const createdAgo = years > 0 ? `${years} year${years > 1 ? 's' : ''} ago` : months > 0 ? `${months} month${months > 1 ? 's' : ''} ago` : days > 0 ? `${days} day${days > 1 ? 's' : ''} ago` : hours > 0 ? `${hours} hour${hours > 1 ? 's' : ''} ago` : minutes > 0 ? `${minutes} minute${minutes > 1 ? 's' : ''} ago` : 'Less than a minute ago';
+
+            return {
+                        _id : service._id,
+                        key : index,
+                        basicInformation: service.basicInformation,
+                        advanceInformation: service.advanceInformation,
+                        address: service.address,
+                        tags: service.tags,
+                        owner : service.owner,
+                        serviceProfileImage: service.serviceProfileImage,
+                        ratings : average.toFixed(1),
+                        ratingRounded : Math.floor(average),
+                        totalReviews : totalRatings,
+                        createdAgo : createdAgo,
+                        createdAt : service.createdAt
+            }
+          })
+
+  
+      return processedServices
+  };
   const services = await Service.find()
   .populate('owner', 'firstname lastname profileImage')
   .populate('advanceInformation.ServiceCategory', 'name category_code parent_code')
@@ -21,7 +60,10 @@ module.exports.getServices = async (req,res) =>{
     select: 'name subCategory_code parent_code',
     options: { skipInvalidIds: true } // Skip invalid IDs (e.g., null or non-existent)
   }).select("advanceInformation basicInformation serviceProfileImage tags userId createdAt owner address")
-    return res.json(services);
+  const ratingList = await ratings.find()
+      
+  const final = ratingAverage(services, ratingList)
+  return res.json(final);
   }
 
   // If user is loggedIn, get first the dns and favorite and compare
@@ -119,9 +161,7 @@ module.exports.getServices = async (req,res) =>{
     } else {
       return res.status(403).json({ error: 'Forbidden' });
     }
-  }
-
-    
+  } 
 }
 
 
