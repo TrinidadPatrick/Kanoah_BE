@@ -178,7 +178,6 @@ module.exports.Mobile_GetServicesByFilter = async (req,res) => {
               { 'basicInformation.ServiceTitle': searchValue === '' ? {$exists: true} : null }
             ]
           });  
-          console.log(services)
           const computed = await computeRatings(services)
           
           return res.json({services : computed})
