@@ -39,7 +39,7 @@ module.exports.CLIENT_getInProgressBooking = async (req,res) => {
     const getBookingInfo = async (_id) => {
         try {
             const result = await bookings.find({client : _id, $and : [{status : "INPROGRESS"}, {status : {$ne : "DELETED"}}]})
-            .populate('shop', 'serviceProfileImage basicInformation')
+            .populate('shop', 'serviceProfileImage basicInformation owner')
             return res.status(200).send(result)
         } catch (error) {
             return res.status(400).send({error})
@@ -109,7 +109,7 @@ module.exports.CLIENT_getCancelledBooking = async (req,res) => {
     const getBookingInfo = async (_id) => {
         try {
             const result = await bookings.find({client : _id, $and : [{status : "CANCELLED"}, {status : {$ne : "DELETED"}}]})
-            .populate('shop', 'serviceProfileImage basicInformation')
+            .populate('shop', 'serviceProfileImage basicInformation owner')
             return res.status(200).send(result)
         } catch (error) {
             return res.status(400).send({error})
@@ -144,7 +144,7 @@ module.exports.CLIENT_getHistoryBooking = async (req,res) => {
     const getBookingInfo = async (_id) => {
         try {
             const result = await bookings.find({$and: [{ client : _id },{$or: [{ status: "COMPLETED" },{ status: "CANCELLED" }]},{ status: { $ne: "DELETED" } }]})
-            .populate('shop', 'serviceProfileImage basicInformation')
+            .populate('shop', 'serviceProfileImage basicInformation owner')
             return res.status(200).send(result)
         } catch (error) {
             return res.status(400).send({error})
