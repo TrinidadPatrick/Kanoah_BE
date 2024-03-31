@@ -182,6 +182,7 @@ module.exports.getInProgressBooking = async (req,res) => {
 
     try {
         const result = await bookings.find({shop: _id, $and: [{ status: "INPROGRESS" },{ status: { $ne: "DELETED" } }]})
+        .populate('shop', 'serviceProfileImage basicInformation owner')
         return res.status(200).send(result)
     } catch (error) {
         return res.status(400).send({error})
