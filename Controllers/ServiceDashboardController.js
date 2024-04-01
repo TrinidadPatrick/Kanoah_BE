@@ -14,6 +14,7 @@ module.exports.countBookings = async (req,res) => {
         try {
             const thisMonth = await bookings.countDocuments({
                 shop: service,
+                status : "COMPLETED",
                 createdAt: dateFilter ? {
                   $gte: new Date(dateFilter + "-01").toISOString(),
                   $lt: new Date(new Date(dateFilter + "-01").setMonth(new Date(dateFilter + "-01").getMonth() + 1)).toISOString()
@@ -205,6 +206,7 @@ module.exports.getTotalSales = async (req,res) => {
         try {
             const thisMonth = await bookings.find({
                 shop : service,
+                status : 'COMPLETED',
                 createdAt: dateFilter ? {
                   $gte: new Date(dateFilter + "-01").toISOString(),
                   $lt: new Date(new Date(dateFilter + "-01").setMonth(new Date(dateFilter + "-01").getMonth() + 1)).toISOString()
@@ -269,6 +271,7 @@ module.exports.getMonthlySales = async (req,res) => {
         try {
             const thisMonth = await bookings.find({
                 shop : service,
+                status : "COMEPLETED"
             })
             const sales = thisMonth.reduce((sum, booking) => sum + Number(booking.service.price), 0)
 
