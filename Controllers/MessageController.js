@@ -149,7 +149,7 @@ module.exports.retrieveContacts = async (req,res) => {
 
     const getContacts = async (user) => {
         try {
-            const chatIds = await messages.distinct('conversationId', { participants : { $in: [_id]}, deletedFor: { $nin: [user._id] }})
+            const chatIds = await messages.distinct('conversationId', { participants : { $in: [_id]}})
             const uniqueChats = new Set(chatIds)
             const chats = await Promise.all([...uniqueChats].map(async (conversationId)=>{
             const chat = await messages.findOne({ participants : _id, conversationId}).sort({ createdAt: -1 })
@@ -185,9 +185,9 @@ module.exports.getMessages = async (req,res) => {
 
     const getMessage = async (user) => {
         try {
-            const documentCount = await messages.countDocuments({ conversationId: conversationId, deletedFor: { $nin: [user._id] }})
+            const documentCount = await messages.countDocuments({ conversationId: conversationId})
             const messagesArray = await messages
-                .find({ conversationId: conversationId, deletedFor: { $nin: [user._id] }})
+                .find({ conversationId: conversationId})
                 .skip(0)
                 .limit(returnLimit)
                 .sort({

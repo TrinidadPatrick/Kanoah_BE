@@ -52,7 +52,7 @@ module.exports.getServices = async (req,res) =>{
   
       return processedServices
   };
-  const services = await Service.find()
+  const services = await Service.find({'status.status' : 'Active'})
   .populate('owner', 'firstname lastname profileImage')
   .populate('advanceInformation.ServiceCategory', 'name category_code parent_code')
   .populate({
@@ -114,7 +114,7 @@ module.exports.getServices = async (req,res) =>{
   };
     
     try {
-      const services = await Service.find()
+      const services = await Service.find({'status.status' : 'Active'})
       .populate('owner', 'firstname lastname profileImage')
       .populate('advanceInformation.ServiceCategory', 'name category_code parent_code')
       .populate({
