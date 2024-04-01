@@ -118,17 +118,6 @@ module.exports.sendMessage = async (req,res) => {
     // if conversation id is not existing, create a new document with a new conversation id
     else
     {
-        // Check if conversation is existing rom deleted conversation and use that conversation ID
-        const checkDeletedConvo = await messages.find({participants : { $in : participants}, serviceInquired})
-        if(checkDeletedConvo.length !== 0)
-        {
-        try {
-            const result = await messages.create({conversationId : checkDeletedConvo[0].conversationId, participants,serviceInquired, readBy, createdAt,messageType,deletedFor : [], messageContent})
-            return res.json({result})
-        } catch (error) {
-            return res.json({status : "failed", message : error})
-        }
-        }
         try {
             
             const result = await messages.create({conversationId, participants,serviceInquired, readBy, createdAt,messageType,deletedFor : [], messageContent})
