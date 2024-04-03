@@ -21,10 +21,10 @@ module.exports.countBookings = async (req,res) => {
                 } : null
               })
 
-               // Calculate the start date of the previous month
+               // Calculates the start date of the previous month
                const prevMonthStart = new Date(new Date(dateFilter + "-01").setMonth(new Date(dateFilter + "-01").getMonth() - 1)).toISOString()
 
-               // Calculate the end date of the previous month
+               // Calculates the end date of the previous month
                const prevMonthEnd = new Date(dateFilter + "-01").toISOString()
 
                const prevMonth = await ratings.countDocuments({
