@@ -330,7 +330,7 @@ module.exports.login = async (req,res) => {
 
     const result = await user.findOne({ $or : [{username : UsernameOrEmail}, {email : UsernameOrEmail.toLowerCase()}] })
     if(result != null){
-        if(result.isDeactivated)
+        if(result.isDeactivated || result.status.status === "Disabled")
         {
             return res.status(404).json({ status: 'account not found' });
         }

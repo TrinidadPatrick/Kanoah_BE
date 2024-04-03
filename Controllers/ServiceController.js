@@ -269,7 +269,7 @@ module.exports.getServiceInfo = async (req,res) => {
       const years = Math.floor(months / 12);
       const createdAgo = years > 0 ? `${years} year${years > 1 ? 's' : ''} ago` : months > 0 ? `${months} month${months > 1 ? 's' : ''} ago` : days > 0 ? `${days} day${days > 1 ? 's' : ''} ago` : hours > 0 ? `${hours} hour${hours > 1 ? 's' : ''} ago` : minutes > 0 ? `${minutes} minute${minutes > 1 ? 's' : ''} ago` : 'Less than a minute ago';
     
-       return res.json({status : "success", service : {
+       return res.status(200).json({status : "success", service : {
         _id : service._id,
         basicInformation: service.basicInformation,
         advanceInformation: service.advanceInformation,
