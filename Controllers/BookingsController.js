@@ -7,7 +7,7 @@ const jwt = require('jsonwebtoken')
 module.exports.getBookingSchedules = async (req,res) => {
     const {shop_id} = req.params
     try {
-        const result = await bookings.find({shop : shop_id}).select("schedule")
+        const result = await bookings.find({shop : shop_id, status : "INPROGRESS"}).select("schedule")
         if(result)
         {
             res.status(200).json(result)
