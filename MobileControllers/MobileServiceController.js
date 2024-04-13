@@ -240,3 +240,91 @@ module.exports.Mobile_GetServicesByFilter = async (req,res) => {
    
       getServices()
 }
+
+// Get Service for profile
+module.exports.Mobile_getService = async (req,res) => {
+  const accessToken = req.headers.authorization.split(' ')[1]
+
+  const getService = async (_id) => {
+
+          try {
+              const result = await Service.findOne({owner : _id}).populate('owner', 'firstname lastname')
+              return res.json(result)
+          } catch (error) {
+              return res.json({status : "failed", message : error})
+          }
+      }
+  
+  
+  if (!accessToken) {
+      return res.status(401).json({ error: 'Unauthorized' });
+    }
+  
+    try {
+      jwt.verify(accessToken, process.env.SECRET_KEY, (err, user)=>{
+        if(err)
+        {
+            return res.status(403).json({ error: 'Forbidden' });
+        }
+        
+        getService(user._id);
+      });
+    } catch (err) {
+        
+      if (err.name === 'TokenExpiredError') {
+        return res.status(401).json({ error: 'Token expired' });
+      } else {
+        return res.status(403).json({ error: 'Forbidden' });
+      }
+    }
+  
+
+}
+
+// Update the service information
+module.exports.Mobile_updateService = async (req,res)=>{
+
+  const accessToken = req.headers.authorization.split(' ')[1]
+  const updateData = req.body
+  // Updates the service
+  const updateService = async (_id) => {
+
+          try {
+              const updated = await Service.findOneAndUpdate(
+                  {userId : _id},
+                  {$set : updateData}
+              )
+              return res.json({status : "Success"})
+          } catch (error) {
+              return res.status(404).json({error : error})
+          }
+      
+      
+  }
+
+  if (!accessToken) {
+      return res.status(401).json({ error: 'Unauthorized' });
+    }
+  
+    try {
+      jwt.verify(accessToken, process.env.SECRET_KEY, (err, user)=>{
+        if(err)
+        {
+           
+            return res.status(403).json({ errors: 'Forbidden' });
+
+        }
+              
+          updateService(user._id)
+      });
+    } catch (err) {
+       
+      if (err.name === 'TokenExpiredError') {
+        return res.status(401).json({ error: 'Token expired' });
+      } else {
+        return res.status(403).json({ error: 'Forbidden' });
+        
+      }
+    }
+
+}

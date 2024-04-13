@@ -11,6 +11,7 @@ module.exports.addNotification = async (req,res) => {
 
         return res.status(200).json({status : "Success"})
     } catch (error) {
+      console.log(error)
         return res.status(500).json({message : error})
     }
 }

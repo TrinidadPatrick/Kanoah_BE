@@ -14,10 +14,16 @@ const { AddRating, getAllRatings, getUserRatings, getServiceRatings, removeRatin
 const { getServices, addService, getService, addGalleryImage, getGalleryImages, deleteImage, deleteMultipleImages, addFeaturedImage, getFeaturedImages, deleteFeaturedImage, deleteMultipleFeaturedImages, updateProfilePicture, getServiceInfo, getServiceProfile, updateService } = require('../Controllers/ServiceController')
 const { countBookings, countRatings, getRatingAverage, getTotalSales, getMonthlySales, getMonthlyBookings, getDBBookings, getDBServiceOffers } = require('../Controllers/ServiceDashboardController')
 const {register, verifyEmail, verifyOTP, login, forgotPassword, newPassword, submitOtpForNewPassword, verifyUsername, getUsers, getUser, updateUser, verifyPassword, updatePassword, deactivateAccount, refresh, profile, handleFb, handleFbLogin, getUserInfo, userLogout} = require('../Controllers/UserController')
-const { Mobile_GetServices, Mobile_GetServicesByFilter } = require('../MobileControllers/MobileServiceController')
+const { Mobile_GetServices, Mobile_GetServicesByFilter, Mobile_getService, Mobile_updateService } = require('../MobileControllers/MobileServiceController')
 const { Mobile_login, Mobile_getUser, Mobile_updateProfile } = require('../MobileControllers/UserController')
 const { AddReport, AdminGetReports, AdminUpdateReport, AdminGetPendingReports, AdminGetReportHistory, AdminGetAllReportCounts } = require('../Controllers/ReportController')
 const { AdminAddNotification } = require('../Controllers/Admin_NotificationController')
+const { Mobile_CLIENT_getInProgressBooking, Mobile_CLIENT_getCompletedBooking, Mobile_CLIENT_getCancelledBooking } = require('../MobileControllers/MobileBookingController')
+const { Mobile_getDoNotShow, Mobile_removeDoNotShow } = require('../MobileControllers/MobileDNSController')
+const { Mobile_getFavorites } = require('../MobileControllers/MobileFavoritesController')
+const { Mobile_AddRating, Mobile_getUserRatings } = require('../MobileControllers/MobileRatingController')
+const { Mobile_getGalleryImages, Mobile_addGalleryImage, Mobile_deleteMultipleImages } = require('../MobileControllers/MobileGalleryController')
+const { Mobile_getFeaturedImages, Mobile_addFeaturedImage, Mobile_deleteMultipleFeaturedImages } = require('../MobileControllers/MobileFeaturedController')
 const router = Router()
 
 // User Routes
@@ -182,6 +188,13 @@ router.get('/getDBServiceOffers', getDBServiceOffers)
 // Report Routes
 router.post('/AddReport', AddReport)
 
+
+
+
+
+
+
+
 // MOBILE ROUTESS
 
 router.post("/loginMobile", Mobile_login)
@@ -192,5 +205,36 @@ router.patch("/Mobile_updateProfile", Mobile_updateProfile)
 // Service Routes
 router.get("/Mobile_GetServices", Mobile_GetServices)
 router.get("/Mobile_GetServicesByFilter", Mobile_GetServicesByFilter)
+router.get("/Mobile_getService", Mobile_getService)
+router.patch("/Mobile_updateService", Mobile_updateService)
+
+// Booking Routes
+router.get("/Mobile_CLIENT_getInProgressBooking", Mobile_CLIENT_getInProgressBooking)
+router.get("/Mobile_CLIENT_getCompletedBooking", Mobile_CLIENT_getCompletedBooking)
+router.get("/Mobile_CLIENT_getCancelledBooking", Mobile_CLIENT_getCancelledBooking)
+
+// DNS Route
+router.get("/Mobile_getDoNotShow", Mobile_getDoNotShow)
+router.delete("/Mobile_removeDoNotShow/:serviceId", Mobile_removeDoNotShow)
+
+// Favorites Routes
+router.get("/Mobile_getFavorites", Mobile_getFavorites)
+
+// Rating Routes
+router.post("/Mobile_AddRating", Mobile_AddRating)
+router.get("/Mobile_getUserRatings", Mobile_getUserRatings)
+
+// Service Gallery Route
+router.get("/Mobile_getGalleryImages", Mobile_getGalleryImages)
+router.patch("/Mobile_addGalleryImage/:_id", Mobile_addGalleryImage)
+router.post("/Mobile_deleteMultipleImages", Mobile_deleteMultipleImages)
+
+
+// Service Featured Route
+router.get("/Mobile_getFeaturedImages", Mobile_getFeaturedImages)
+router.patch("/Mobile_addFeaturedImage/:_id", Mobile_addFeaturedImage)
+router.post("/Mobile_deleteMultipleFeaturedImages", Mobile_deleteMultipleFeaturedImages)
+
+
 
 module.exports = router;
