@@ -43,6 +43,14 @@ const BookingSchema = new mongoose.Schema({
     rated : {
         type : Boolean,
         default : false
+    },
+    updatedAt : {
+        type : String,
+        default : ""
+    },
+    cancelledBy : {
+        type : Object,
+        default : {}
     }
 })
 

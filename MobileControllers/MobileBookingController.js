@@ -116,3 +116,120 @@ module.exports.Mobile_CLIENT_getCancelledBooking = async (req,res) => {
         }
       }
 }
+
+module.exports.Mobile_getInProgressBooking = async (req,res) => {
+  const {shopId} = req.params
+  const accessToken = req.headers.authorization.split(' ')[1]
+
+  const getInProgressBookings = async (userId) => {
+    try {
+      const result = await bookings.find({shop: shopId, $and: [{ status: "INPROGRESS" },{ status: { $ne: "DELETED" } }]})
+      .populate('shop', 'serviceProfileImage basicInformation owner')
+      return res.status(200).send(result)
+  } catch (error) {
+      return res.status(400).send({error})
+  }
+  }
+
+  if (!accessToken) {
+    return res.status(401).json({ error: 'Unauthorized' });
+  }
+
+  try {
+    jwt.verify(accessToken, process.env.SECRET_KEY, (err, user)=>{
+      if(err)
+      {
+        
+          return res.status(403).json({ error: 'Forbidden' });
+      }
+      
+      getInProgressBookings(user._id);
+    });
+  } catch (err) {
+      
+    if (err.name === 'TokenExpiredError') {
+      return res.status(401).json({ error: 'Token expired' });
+    } else {
+        console.log(err)
+      return res.status(403).json({ error: 'Forbidden' });
+    }
+  }
+}
+
+module.exports.Mobile_getCompletedBooking = async (req,res) => {
+  const {shopId} = req.params
+  const accessToken = req.headers.authorization.split(' ')[1]
+
+  const getCompletedBookings = async (userId) => {
+    try {
+      const result = await bookings.find({shop: shopId, $and: [{ status: "COMPLETED" },{ status: { $ne: "DELETED" } }]})
+      .populate('shop', 'serviceProfileImage basicInformation owner')
+      return res.status(200).send(result)
+  } catch (error) {
+      return res.status(400).send({error})
+  }
+  }
+
+  if (!accessToken) {
+    return res.status(401).json({ error: 'Unauthorized' });
+  }
+
+  try {
+    jwt.verify(accessToken, process.env.SECRET_KEY, (err, user)=>{
+      if(err)
+      {
+        
+          return res.status(403).json({ error: 'Forbidden' });
+      }
+      
+      getCompletedBookings(user._id);
+    });
+  } catch (err) {
+      
+    if (err.name === 'TokenExpiredError') {
+      return res.status(401).json({ error: 'Token expired' });
+    } else {
+        console.log(err)
+      return res.status(403).json({ error: 'Forbidden' });
+    }
+  }
+}
+
+module.exports.Mobile_getCancelledBooking = async (req,res) => {
+  const {shopId} = req.params
+  const accessToken = req.headers.authorization.split(' ')[1]
+
+  const getCompletedBookings = async (userId) => {
+    try {
+      const result = await bookings.find({shop: shopId, $and: [{ status: "CANCELLED" },{ status: { $ne: "DELETED" } }]})
+      .populate('shop', 'serviceProfileImage basicInformation owner')
+      return res.status(200).send(result)
+  } catch (error) {
+      return res.status(400).send({error})
+  }
+  }
+
+  if (!accessToken) {
+    return res.status(401).json({ error: 'Unauthorized' });
+  }
+
+  try {
+    jwt.verify(accessToken, process.env.SECRET_KEY, (err, user)=>{
+      if(err)
+      {
+        
+          return res.status(403).json({ error: 'Forbidden' });
+      }
+      
+      getCompletedBookings(user._id);
+    });
+  } catch (err) {
+      
+    if (err.name === 'TokenExpiredError') {
+      return res.status(401).json({ error: 'Token expired' });
+    } else {
+        console.log(err)
+      return res.status(403).json({ error: 'Forbidden' });
+    }
+  }
+}

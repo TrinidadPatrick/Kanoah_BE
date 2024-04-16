@@ -18,7 +18,7 @@ const { Mobile_GetServices, Mobile_GetServicesByFilter, Mobile_getService, Mobil
 const { Mobile_login, Mobile_getUser, Mobile_updateProfile } = require('../MobileControllers/UserController')
 const { AddReport, AdminGetReports, AdminUpdateReport, AdminGetPendingReports, AdminGetReportHistory, AdminGetAllReportCounts } = require('../Controllers/ReportController')
 const { AdminAddNotification } = require('../Controllers/Admin_NotificationController')
-const { Mobile_CLIENT_getInProgressBooking, Mobile_CLIENT_getCompletedBooking, Mobile_CLIENT_getCancelledBooking } = require('../MobileControllers/MobileBookingController')
+const { Mobile_CLIENT_getInProgressBooking, Mobile_CLIENT_getCompletedBooking, Mobile_CLIENT_getCancelledBooking, Mobile_getInProgressBooking, Mobile_getCompletedBooking, Mobile_getCancelledBooking } = require('../MobileControllers/MobileBookingController')
 const { Mobile_getDoNotShow, Mobile_removeDoNotShow } = require('../MobileControllers/MobileDNSController')
 const { Mobile_getFavorites } = require('../MobileControllers/MobileFavoritesController')
 const { Mobile_AddRating, Mobile_getUserRatings } = require('../MobileControllers/MobileRatingController')
@@ -212,6 +212,11 @@ router.patch("/Mobile_updateService", Mobile_updateService)
 router.get("/Mobile_CLIENT_getInProgressBooking", Mobile_CLIENT_getInProgressBooking)
 router.get("/Mobile_CLIENT_getCompletedBooking", Mobile_CLIENT_getCompletedBooking)
 router.get("/Mobile_CLIENT_getCancelledBooking", Mobile_CLIENT_getCancelledBooking)
+
+// Service Bookings Routes
+router.get("/Mobile_getInProgressBooking/:shopId", Mobile_getInProgressBooking)
+router.get("/Mobile_getCompletedBooking/:shopId", Mobile_getCompletedBooking)
+router.get("/Mobile_getCancelledBooking/:shopId", Mobile_getCancelledBooking)
 
 // DNS Route
 router.get("/Mobile_getDoNotShow", Mobile_getDoNotShow)
