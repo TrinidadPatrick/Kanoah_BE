@@ -81,6 +81,11 @@ io.on('connection', (socket) => {
         removeUser(socket.id);
         io.emit('onlineUsers', onlineUsers);
     });
+
+    socket.on('disconnectUser', () => {
+        removeUser(socket.id);
+        io.emit('onlineUsers', onlineUsers);
+    });
 });
 
 
