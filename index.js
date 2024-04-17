@@ -51,6 +51,8 @@ const getUser = (username) => {
     return onlineUsers.find((user) => user.username === username);
 }
 
+console.log(onlineUsers)
+
 // For socket.io
 io.on('connection', (socket) => {
     // Notify user theres a new message
@@ -65,7 +67,6 @@ io.on('connection', (socket) => {
     socket.on('New_Notification', ({ notification, receiver }) => {
         
         const receiverUser = getUser(receiver);
-        console.log(notification)
         if (receiverUser !== undefined) {
             io.to(receiverUser.socketId).emit('New_Notification', notification);
         }

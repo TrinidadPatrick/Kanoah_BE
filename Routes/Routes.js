@@ -21,9 +21,10 @@ const { AdminAddNotification } = require('../Controllers/Admin_NotificationContr
 const { Mobile_CLIENT_getInProgressBooking, Mobile_CLIENT_getCompletedBooking, Mobile_CLIENT_getCancelledBooking, Mobile_getInProgressBooking, Mobile_getCompletedBooking, Mobile_getCancelledBooking } = require('../MobileControllers/MobileBookingController')
 const { Mobile_getDoNotShow, Mobile_removeDoNotShow } = require('../MobileControllers/MobileDNSController')
 const { Mobile_getFavorites } = require('../MobileControllers/MobileFavoritesController')
-const { Mobile_AddRating, Mobile_getUserRatings } = require('../MobileControllers/MobileRatingController')
+const { Mobile_AddRating, Mobile_getUserRatings, Mobile_getServiceRatingWithFilter, Mobile_removeRating, Mobile_restoreRating } = require('../MobileControllers/MobileRatingController')
 const { Mobile_getGalleryImages, Mobile_addGalleryImage, Mobile_deleteMultipleImages } = require('../MobileControllers/MobileGalleryController')
 const { Mobile_getFeaturedImages, Mobile_addFeaturedImage, Mobile_deleteMultipleFeaturedImages } = require('../MobileControllers/MobileFeaturedController')
+const { Mobile_retrieveContacts, Mobile_getMessages } = require('../MobileControllers/MobileMessageController')
 const router = Router()
 
 // User Routes
@@ -228,6 +229,9 @@ router.get("/Mobile_getFavorites", Mobile_getFavorites)
 // Rating Routes
 router.post("/Mobile_AddRating", Mobile_AddRating)
 router.get("/Mobile_getUserRatings", Mobile_getUserRatings)
+router.get('/Mobile_getServiceRatingWithFilter', Mobile_getServiceRatingWithFilter)
+router.patch('/Mobile_removeRating/:ratingId', Mobile_removeRating)
+router.patch('/Mobile_restoreRating/:ratingId', Mobile_restoreRating)
 
 // Service Gallery Route
 router.get("/Mobile_getGalleryImages", Mobile_getGalleryImages)
@@ -239,6 +243,10 @@ router.post("/Mobile_deleteMultipleImages", Mobile_deleteMultipleImages)
 router.get("/Mobile_getFeaturedImages", Mobile_getFeaturedImages)
 router.patch("/Mobile_addFeaturedImage/:_id", Mobile_addFeaturedImage)
 router.post("/Mobile_deleteMultipleFeaturedImages", Mobile_deleteMultipleFeaturedImages)
+
+// Chat routes
+router.get("/Mobile_retrieveContacts/:_id", Mobile_retrieveContacts)
+router.get("/Mobile_getMessages/:conversationId/:returnLimit/:serviceOwnerId", Mobile_getMessages)
 
 
 
