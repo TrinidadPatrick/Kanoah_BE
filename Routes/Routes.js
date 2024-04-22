@@ -9,7 +9,7 @@ const { addToDoNotShow, getDoNotShow, removeDoNotShow } = require('../Controller
 const { addFavorites, getFavorites, removeFavorites } = require('../Controllers/FavoritesController')
 const { payGcash, checkPaymentStatus } = require('../Controllers/GcashController')
 const { fetchAllUsers, getReceiver, getServiceFromChat, sendMessage, retrieveContacts, getMessages, getAllMessages, handleReadMessage, viewChatMemberProfile, handleDeleteConversation, checkUnreadMessages,  } = require('../Controllers/MessageController')
-const { addNotification, getNotifications, markAsRead, countUnreadNotifs, markAllAsRead } = require('../Controllers/NotificationController')
+const { addNotification, getNotifications, markAsRead, countUnreadNotifs, markAllAsRead, deleteNotif } = require('../Controllers/NotificationController')
 const { AddRating, getAllRatings, getUserRatings, getServiceRatings, removeRating, restoreRating, getServiceRatingWithFilter, AdminDashboard_GetRatings } = require('../Controllers/RatingController')
 const { getServices, addService, getService, addGalleryImage, getGalleryImages, deleteImage, deleteMultipleImages, addFeaturedImage, getFeaturedImages, deleteFeaturedImage, deleteMultipleFeaturedImages, updateProfilePicture, getServiceInfo, getServiceProfile, updateService } = require('../Controllers/ServiceController')
 const { countBookings, countRatings, getRatingAverage, getTotalSales, getMonthlySales, getMonthlyBookings, getDBBookings, getDBServiceOffers } = require('../Controllers/ServiceDashboardController')
@@ -24,7 +24,8 @@ const { Mobile_getFavorites } = require('../MobileControllers/MobileFavoritesCon
 const { Mobile_AddRating, Mobile_getUserRatings, Mobile_getServiceRatingWithFilter, Mobile_removeRating, Mobile_restoreRating } = require('../MobileControllers/MobileRatingController')
 const { Mobile_getGalleryImages, Mobile_addGalleryImage, Mobile_deleteMultipleImages } = require('../MobileControllers/MobileGalleryController')
 const { Mobile_getFeaturedImages, Mobile_addFeaturedImage, Mobile_deleteMultipleFeaturedImages } = require('../MobileControllers/MobileFeaturedController')
-const { Mobile_retrieveContacts, Mobile_getMessages } = require('../MobileControllers/MobileMessageController')
+const { Mobile_retrieveContacts, Mobile_getMessages, Mobile_sendMessage, Mobile_countUnreadMessages } = require('../MobileControllers/MobileMessageController')
+const { Mobile_getNotifications, Mobile_markAsRead, Mobile_countUnreadNotifs, Mobile_markAllAsRead, Mobile_deleteNotif } = require('../MobileControllers/MobileNotificationController')
 const router = Router()
 
 // User Routes
@@ -174,6 +175,7 @@ router.get('/getNotifications', getNotifications)
 router.patch('/markAsRead', markAsRead)
 router.get('/countUnreadNotifs', countUnreadNotifs)
 router.patch('/markAllAsRead', markAllAsRead)
+router.delete('/deleteNotif/:notifId', deleteNotif)
 
 
 // DashBoard Route
@@ -247,6 +249,15 @@ router.post("/Mobile_deleteMultipleFeaturedImages", Mobile_deleteMultipleFeature
 // Chat routes
 router.get("/Mobile_retrieveContacts/:_id", Mobile_retrieveContacts)
 router.get("/Mobile_getMessages/:conversationId/:returnLimit/:serviceOwnerId", Mobile_getMessages)
+router.post("/Mobile_sendMessage", Mobile_sendMessage)
+router.get("/Mobile_countUnreadMessages", Mobile_countUnreadMessages)
+
+// Notification Route
+router.get('/Mobile_getNotifications', Mobile_getNotifications)
+router.patch('/Mobile_markAsRead', Mobile_markAsRead)
+router.get('/Mobile_countUnreadNotifs', Mobile_countUnreadNotifs)
+router.patch('/Mobile_markAllAsRead', Mobile_markAllAsRead)
+router.delete('/Mobile_deleteNotif/:notifId', Mobile_deleteNotif)
 
 
 

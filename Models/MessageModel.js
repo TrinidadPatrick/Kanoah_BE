@@ -13,6 +13,7 @@ const messageSchema = new mongoose.Schema({
         sender : {type: mongoose.Schema.Types.ObjectId, ref: 'User_Info'},
         receiver: {type: mongoose.Schema.Types.ObjectId, ref: 'User_Info'},
         content: String,
+        size : {type : Object},
         date : {type: String},
         timestamp : {type: String}
     }

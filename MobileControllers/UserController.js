@@ -20,8 +20,9 @@ module.exports.Mobile_login = async (req,res) => {
     if(result != null){
         const comparePassword = await bcrypt.compare(password, result.password)
         if(comparePassword){
+            const userId = result._id
             const accessToken = generateToken({ _id : result._id})       
-            return res.send({ status: 'authenticated', accessToken })
+            return res.send({ status: 'authenticated', accessToken, userId })
 
            
         }else {

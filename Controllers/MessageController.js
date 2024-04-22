@@ -104,7 +104,6 @@ module.exports.sendMessage = async (req,res) => {
     const serviceInquired = data.serviceInquired
     //check if the conversation between user is existing
     const checkChatExisting = await messages.findOne({conversationId : req.body.conversationId})
-
     // If conversation id is existing, create a new document with the conversation id same as the existing one
     if(checkChatExisting != null)
     {
