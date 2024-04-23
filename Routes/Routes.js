@@ -26,6 +26,7 @@ const { Mobile_getGalleryImages, Mobile_addGalleryImage, Mobile_deleteMultipleIm
 const { Mobile_getFeaturedImages, Mobile_addFeaturedImage, Mobile_deleteMultipleFeaturedImages } = require('../MobileControllers/MobileFeaturedController')
 const { Mobile_retrieveContacts, Mobile_getMessages, Mobile_sendMessage, Mobile_countUnreadMessages } = require('../MobileControllers/MobileMessageController')
 const { Mobile_getNotifications, Mobile_markAsRead, Mobile_countUnreadNotifs, Mobile_markAllAsRead, Mobile_deleteNotif } = require('../MobileControllers/MobileNotificationController')
+const { Mobile_countBookings, Mobile_countRatings, Mobile_getRatingAverage, Mobile_getTotalSales, Mobile_getMonthlySales } = require('../MobileControllers/MobileDashboardController')
 const router = Router()
 
 // User Routes
@@ -258,6 +259,16 @@ router.patch('/Mobile_markAsRead', Mobile_markAsRead)
 router.get('/Mobile_countUnreadNotifs', Mobile_countUnreadNotifs)
 router.patch('/Mobile_markAllAsRead', Mobile_markAllAsRead)
 router.delete('/Mobile_deleteNotif/:notifId', Mobile_deleteNotif)
+
+// DashBoard Route
+router.get('/Mobile_countBookings', Mobile_countBookings)
+router.get('/Mobile_countRatings', Mobile_countRatings)
+router.get('/Mobile_getRatingAverage', Mobile_getRatingAverage)
+router.get('/Mobile_getTotalSales', Mobile_getTotalSales)
+router.get('/Mobile_getMonthlySales', Mobile_getMonthlySales)
+// router.get('/getMonthlyBookings', getMonthlyBookings)
+// router.get('/getDBBookings', getDBBookings)
+// router.get('/getDBServiceOffers', getDBServiceOffers)
 
 
 

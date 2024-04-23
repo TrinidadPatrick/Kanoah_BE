@@ -4,9 +4,10 @@ const ratings = require('../Models/RatingModel')
 const bookings = require('../Models/BookingModel')
 const jwt = require('jsonwebtoken')
 
+
 // Get total booking count
-module.exports.countBookings = async (req,res) => {
-    const accessToken = req.cookies.accessToken
+module.exports.Mobile_countBookings = async (req,res) => {
+    const accessToken = req.headers.authorization.split(' ')[1]
     const service = req.query.service
     const dateFilter = req.query.dateFilter
 
@@ -67,8 +68,8 @@ module.exports.countBookings = async (req,res) => {
 }
 
 // Get total Review count
-module.exports.countRatings = async (req,res) => {
-    const accessToken = req.cookies.accessToken
+module.exports.Mobile_countRatings = async (req,res) => {
+    const accessToken = req.headers.authorization.split(' ')[1]
     const service = req.query.service
     const dateFilter = req.query.dateFilter
 
@@ -128,8 +129,8 @@ module.exports.countRatings = async (req,res) => {
 }
 
 // Get the average ratings
-module.exports.getRatingAverage = async (req,res) => {
-    const accessToken = req.cookies.accessToken
+module.exports.Mobile_getRatingAverage = async (req,res) => {
+    const accessToken = req.headers.authorization.split(' ')[1]
     const service = req.query.service
     const dateFilter = req.query.dateFilter
 
@@ -197,8 +198,8 @@ module.exports.getRatingAverage = async (req,res) => {
 }
 
 // Get total Sales
-module.exports.getTotalSales = async (req,res) => {
-    const accessToken = req.cookies.accessToken
+module.exports.Mobile_getTotalSales = async (req,res) => {
+     const accessToken = req.headers.authorization.split(' ')[1]
     const service = req.query.service
     const dateFilter = req.query.dateFilter
 
@@ -231,7 +232,7 @@ module.exports.getTotalSales = async (req,res) => {
             const prevSales = prevMonth.reduce((sum, booking) => sum + Number(booking.service.price), 0)
 
             const percentIncrease = prevSales === 0 ? 0 : ((sales - prevSales) / prevSales) * 100
-            return res.status(200).json({sales : sales.toLocaleString(), percentIncrease : percentIncrease.toFixed(1)})
+            return res.status(200).json({sales : sales, percentIncrease : percentIncrease.toFixed(1)})
         } catch (error) {
             return res.status(500).json(error)
         }
@@ -262,8 +263,8 @@ module.exports.getTotalSales = async (req,res) => {
 }
 
 // Get total sales each Month
-module.exports.getMonthlySales = async (req,res) => {
-    const accessToken = req.cookies.accessToken
+module.exports.Mobile_getMonthlySales = async (req,res) => {
+     const accessToken = req.headers.authorization.split(' ')[1]
     const service = req.query.service
     const dateFilter = req.query.dateFilter
 
@@ -274,7 +275,6 @@ module.exports.getMonthlySales = async (req,res) => {
                 status : "COMPLETED"
             })
             const sales = thisMonth.reduce((sum, booking) => sum + Number(booking.service.price), 0)
-
            
             return res.status(200).json(thisMonth)
         } catch (error) {
@@ -308,7 +308,7 @@ module.exports.getMonthlySales = async (req,res) => {
 
 // Get total sales each Month
 module.exports.getMonthlyBookings = async (req,res) => {
-    const accessToken = req.cookies.accessToken
+     const accessToken = req.headers.authorization.split(' ')[1]
     const service = req.query.service
 
     const getTotalSales = async (userId) => {
@@ -350,7 +350,7 @@ module.exports.getMonthlyBookings = async (req,res) => {
 
 // Get Bookings by filter
 module.exports.getDBBookings = async (req,res) => {
-    const accessToken = req.cookies.accessToken
+     const accessToken = req.headers.authorization.split(' ')[1]
     const service = req.query.service
     const filter = req.query.filter
     const dateFilter = req.query.dateFilter
@@ -415,7 +415,7 @@ module.exports.getDBBookings = async (req,res) => {
 
 // Get All service Offers
 module.exports.getDBServiceOffers = async (req,res) => {
-    const accessToken = req.cookies.accessToken
+     const accessToken = req.headers.authorization.split(' ')[1]
     const service = req.query.service
     const dateFilter = req.query.dateFilter
 
