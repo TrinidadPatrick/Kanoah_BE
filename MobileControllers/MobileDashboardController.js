@@ -307,7 +307,7 @@ module.exports.Mobile_getMonthlySales = async (req,res) => {
 }
 
 // Get total sales each Month
-module.exports.getMonthlyBookings = async (req,res) => {
+module.exports.Mobile_getMonthlyBookings = async (req,res) => {
      const accessToken = req.headers.authorization.split(' ')[1]
     const service = req.query.service
 
@@ -349,40 +349,22 @@ module.exports.getMonthlyBookings = async (req,res) => {
 }
 
 // Get Bookings by filter
-module.exports.getDBBookings = async (req,res) => {
+module.exports.Mobile_getDBBookings = async (req,res) => {
      const accessToken = req.headers.authorization.split(' ')[1]
     const service = req.query.service
-    const filter = req.query.filter
     const dateFilter = req.query.dateFilter
-
-    const filterValue = filter.toUpperCase()
 
     const getBookings = async (userId) => {
         try {
-            if(filter === "All Bookings")
-            {
                 const result = await bookings.find({
                     shop : service,
                     createdAt: dateFilter ? {
                         $gte: new Date(dateFilter + "-01").toISOString(),
                         $lt: new Date(new Date(dateFilter + "-01").setMonth(new Date(dateFilter + "-01").getMonth() + 1)).toISOString()
                       } : null
-                }).populate('client', 'firstname lastname')
+                }).populate('client', 'firstname lastname profileImage').sort({createdAt : -1}).limit(10)
 
                 return res.status(200).json(result)
-            }
-            else
-            {
-                const result = await bookings.find({
-                    shop : service,
-                    status : filterValue,
-                    createdAt: dateFilter ? {
-                        $gte: new Date(dateFilter + "-01").toISOString(),
-                        $lt: new Date(new Date(dateFilter + "-01").setMonth(new Date(dateFilter + "-01").getMonth() + 1)).toISOString()
-                      } : null
-                }).populate('client', 'firstname lastname')
-                return res.status(200).json(result)
-            }
             
         } catch (error) {
             return res.status(500).json(error)
@@ -414,7 +396,7 @@ module.exports.getDBBookings = async (req,res) => {
 }
 
 // Get All service Offers
-module.exports.getDBServiceOffers = async (req,res) => {
+module.exports.Mobile_getDBServiceOffers = async (req,res) => {
      const accessToken = req.headers.authorization.split(' ')[1]
     const service = req.query.service
     const dateFilter = req.query.dateFilter
