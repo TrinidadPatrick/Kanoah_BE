@@ -18,6 +18,14 @@ module.exports.Mobile_login = async (req,res) => {
 
     const result = await user.findOne({ $or : [{username : UsernameOrEmail}, {email : UsernameOrEmail.toLowerCase()} ] })
     if(result != null){
+      if(result.isDeactivated)
+        {
+            return res.status(404).json({ status: 'account not found' });
+        }
+        else if(result.status.status === "Disabled")
+        {
+            return res.status(403).json({ status: 'Account Disabled', reasons : result.status.reasons });
+        }
         const comparePassword = await bcrypt.compare(password, result.password)
         if(comparePassword){
             const userId = result._id
@@ -125,4 +133,5 @@ module.exports.Mobile_updateProfile = async (req,res) => {
     }
   }
 }
+
 

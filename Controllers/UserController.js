@@ -1,4 +1,5 @@
 const user = require('../Models/UserModel')
+const service = require('../Models/ServiceModel')
 const bcrypt = require('bcrypt')
 const nodemailer = require('nodemailer')
 const cookieParser = require('cookie-parser');
@@ -241,6 +242,7 @@ module.exports.deactivateAccount = async (req,res)=> {
         {
             try {
                 await user.findOneAndUpdate({_id : id}, {isDeactivated : true})
+                await service.findOneAndUpdate({userId : id}, {isDeactivated : true})
                 return res.json({status : "Deactivated"})
             } catch (error) {
                 return res.json({error : error, message : "Connection error, please try again later."})
@@ -264,7 +266,7 @@ module.exports.deactivateAccount = async (req,res)=> {
 module.exports.verifyEmail = async (req,res) => {
     const email = req.body.email
    
-    const verifyDuplicateEmail = await user.findOne({email : email.toLowerCase()})
+    const verifyDuplicateEmail = await user.findOne({email : email.toLowerCase(), isDeactivated : false})
     if(verifyDuplicateEmail){
         res.json({status : "EmailExist"})
     }

@@ -27,6 +27,7 @@ const { Mobile_getFeaturedImages, Mobile_addFeaturedImage, Mobile_deleteMultiple
 const { Mobile_retrieveContacts, Mobile_getMessages, Mobile_sendMessage, Mobile_countUnreadMessages } = require('../MobileControllers/MobileMessageController')
 const { Mobile_getNotifications, Mobile_markAsRead, Mobile_countUnreadNotifs, Mobile_markAllAsRead, Mobile_deleteNotif } = require('../MobileControllers/MobileNotificationController')
 const { Mobile_countBookings, Mobile_countRatings, Mobile_getRatingAverage, Mobile_getTotalSales, Mobile_getMonthlySales, Mobile_getMonthlyBookings, Mobile_getDBBookings, Mobile_getDBServiceOffers } = require('../MobileControllers/MobileDashboardController')
+const { Mobile_AddReport } = require('../MobileControllers/MobileReportController')
 const router = Router()
 
 // User Routes
@@ -191,6 +192,7 @@ router.get('/getDBServiceOffers', getDBServiceOffers)
 
 // Report Routes
 router.post('/AddReport', AddReport)
+router.post('/Mobile_AddReport', Mobile_AddReport)
 
 
 

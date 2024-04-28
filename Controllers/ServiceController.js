@@ -52,7 +52,7 @@ module.exports.getServices = async (req,res) =>{
   
       return processedServices
   };
-  const services = await Service.find({'status.status' : 'Active'})
+  const services = await Service.find({'status.status' : 'Active', isDeactivated : false})
   .populate('owner', 'firstname lastname profileImage')
   .populate('advanceInformation.ServiceCategory', 'name category_code parent_code')
   .populate({
@@ -293,9 +293,16 @@ module.exports.getServiceInfo = async (req,res) => {
 
     if(_id){
         try {
-            const service = await Service.findById(_id).populate('owner', 'firstname lastname profileImage username')
-            computeRatings(service)
-            // return res.json({status : "success", service})
+            const service = await Service.findOne({_id : _id, isDeactivated : false, 'status.status' : 'Active'}).populate('owner', 'firstname lastname profileImage username')
+            if(service)
+            {
+              computeRatings(service)
+            }
+            else
+            {
+              return res.json({status : "Not found"})
+            }
+            
         } catch (error) {
             return res.json({status : "failed" , message : error})
         }

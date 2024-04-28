@@ -63,6 +63,10 @@ const ServiceSchema = new mongoose.Schema({
         booking_limit : {
             type : Number,
             default : 1
+        },
+        isDeactivated : {
+            type : Boolean,
+            default : false
         }
         
 })

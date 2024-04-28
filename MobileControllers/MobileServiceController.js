@@ -57,7 +57,7 @@ module.exports.Mobile_GetServices = async (req,res) => {
 
     const getServices = async (userId) => {
         try {
-          const services = await Service.find();
+          const services = await Service.find({'status.status' : 'Active', isDeactivated : false});
           computeRatings(services)
         } catch (error) {
           return error;
@@ -134,6 +134,7 @@ module.exports.Mobile_GetServicesByFilter = async (req,res) => {
           if(latitude == 0 && longitude == 0) //If the user didnt specify or turn on gps
           {
             const services = await Service.find({
+              'status.status' : 'Active', isDeactivated : false,
               'advanceInformation.ServiceCategory': categoryId !== '' ? categoryId : {$exists: true},
               'advanceInformation.ServiceSubCategory': subCategoryId !== '' ? subCategoryId : {$exists: true},
               $or: [
@@ -249,7 +250,11 @@ module.exports.Mobile_getService = async (req,res) => {
 
           try {
               const result = await Service.findOne({owner : _id}).populate('owner', 'firstname lastname')
-              return res.json(result)
+              if(result === null)
+              {
+                return res.json({service : "Not registered"})
+              }
+              return res.json({service : result})
           } catch (error) {
               return res.json({status : "failed", message : error})
           }

@@ -9,6 +9,7 @@ module.exports.addFavorites = async (req,res) => {
     const addFavorite = async (id) => {
         try {
             const result = await favorites.create({userId : id, service : serviceId, createdAt})
+            console.log("Hello")
             if(result)
             {
                 return res.status(200).send({status : "success"})
