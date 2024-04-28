@@ -40,7 +40,8 @@ app.use("/api", Route)
 let onlineUsers = [];
 
 const addNewUser = (username, socketId) => {
-    !onlineUsers.some((user) => user.username === username) && onlineUsers.push({ username, socketId });
+    // !onlineUsers.some((user) => user.username === username) && onlineUsers.push({ username, socketId });
+    onlineUsers.push({ username, socketId });
 }
 
 const removeUser = (socketId) => {
@@ -48,10 +49,8 @@ const removeUser = (socketId) => {
 }
 
 const getUser = (username) => {
-    return onlineUsers.find((user) => user.username === username);
+    return onlineUsers.filter((user) => user.username === username);
 }
-
-console.log(onlineUsers)
 
 // For socket.io
 io.on('connection', (socket) => {
@@ -59,7 +58,10 @@ io.on('connection', (socket) => {
     socket.on('message', ({ notificationMessage, receiverName }) => {
         const receiver = getUser(receiverName);
         if (receiver !== undefined) {
-            io.to(receiver.socketId).emit('message', notificationMessage);
+            receiver.map((rec)=>{
+                io.to(rec.socketId).emit('message', notificationMessage);
+            })
+            // io.to(receiver.socketId).emit('message', notificationMessage);
         }
     });
 

@@ -95,6 +95,7 @@ module.exports.Mobile_updateProfile = async (req,res) => {
           username, firstname, lastname, contact, email, Address, birthDate, profileImage
         }
       })
+      console.log(result)
 
       if (!result) {
         // Handle the case where the user with the specified ID is not found

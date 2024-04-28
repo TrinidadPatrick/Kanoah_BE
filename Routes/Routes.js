@@ -19,8 +19,8 @@ const { Mobile_login, Mobile_getUser, Mobile_updateProfile } = require('../Mobil
 const { AddReport, AdminGetReports, AdminUpdateReport, AdminGetPendingReports, AdminGetReportHistory, AdminGetAllReportCounts } = require('../Controllers/ReportController')
 const { AdminAddNotification } = require('../Controllers/Admin_NotificationController')
 const { Mobile_CLIENT_getInProgressBooking, Mobile_CLIENT_getCompletedBooking, Mobile_CLIENT_getCancelledBooking, Mobile_getInProgressBooking, Mobile_getCompletedBooking, Mobile_getCancelledBooking } = require('../MobileControllers/MobileBookingController')
-const { Mobile_getDoNotShow, Mobile_removeDoNotShow } = require('../MobileControllers/MobileDNSController')
-const { Mobile_getFavorites } = require('../MobileControllers/MobileFavoritesController')
+const { Mobile_getDoNotShow, Mobile_removeDoNotShow, Mobile_addToDoNotShow } = require('../MobileControllers/MobileDNSController')
+const { Mobile_getFavorites, Mobile_addFavorites } = require('../MobileControllers/MobileFavoritesController')
 const { Mobile_AddRating, Mobile_getUserRatings, Mobile_getServiceRatingWithFilter, Mobile_removeRating, Mobile_restoreRating } = require('../MobileControllers/MobileRatingController')
 const { Mobile_getGalleryImages, Mobile_addGalleryImage, Mobile_deleteMultipleImages } = require('../MobileControllers/MobileGalleryController')
 const { Mobile_getFeaturedImages, Mobile_addFeaturedImage, Mobile_deleteMultipleFeaturedImages } = require('../MobileControllers/MobileFeaturedController')
@@ -227,9 +227,11 @@ router.get("/Mobile_getCancelledBooking/:shopId", Mobile_getCancelledBooking)
 // DNS Route
 router.get("/Mobile_getDoNotShow", Mobile_getDoNotShow)
 router.delete("/Mobile_removeDoNotShow/:serviceId", Mobile_removeDoNotShow)
+router.post("/Mobile_addToDoNotShow", Mobile_addToDoNotShow)
 
 // Favorites Routes
 router.get("/Mobile_getFavorites", Mobile_getFavorites)
+router.post("/Mobile_addFavorites", Mobile_addFavorites)
 
 // Rating Routes
 router.post("/Mobile_AddRating", Mobile_AddRating)
