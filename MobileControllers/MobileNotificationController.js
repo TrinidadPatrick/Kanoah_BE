@@ -5,7 +5,7 @@ module.exports.Mobile_getNotifications = async (req,res) => {
 
     const accessToken = req.headers.authorization.split(' ')[1]
     const page = req.query.page || 1
-    const pageSize = 20
+    const pageSize = 500
     const skip = (page - 1) * pageSize
 
     const getNotif = async (userId) => {

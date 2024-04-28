@@ -180,7 +180,7 @@ module.exports.getMessages = async (req,res) => {
                 .limit(returnLimit)
                 .sort({
                     'createdAt' : -1
-                }).populate('virtualServiceInquired', 'basicInformation serviceProfileImage').populate('participants', '_id profileImage')
+                }).populate('virtualServiceInquired', 'basicInformation serviceProfileImage').populate('participants', '_id profileImage firstname lastname')
                 .exec();
                 // console.log(documentCount)
             const result = messagesArray.reverse()
