@@ -279,8 +279,8 @@ module.exports.verifyEmail = async (req,res) => {
     
         code = arr.join("")
         res.json({status : 'emailSent'})
-    const emailTo = req.body.email
-    const transporter = nodemailer.createTransport({
+        const emailTo = req.body.email
+        const transporter = nodemailer.createTransport({
         service : 'gmail',
         auth : {
           user : process.env.USER,

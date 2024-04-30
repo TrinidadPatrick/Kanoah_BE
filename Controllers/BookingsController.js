@@ -2,6 +2,8 @@ const bookings = require('../Models/BookingModel')
 const service = require('../Models/ServiceModel')
 const user = require('../Models/UserModel')
 const jwt = require('jsonwebtoken')
+const nodemailer = require('nodemailer')
+require("dotenv").config();
 
 // get all the booking schedule of a service
 module.exports.getBookingSchedules = async (req,res) => {
@@ -15,6 +17,38 @@ module.exports.getBookingSchedules = async (req,res) => {
     } catch (error) {
         return res.status(400).send({error})
     }
+}
+
+// Sends a receipt to the client with the booking details
+module.exports.sendBookingReceipt = async (req,res) => {
+  const emailTo = req.body.email
+  const html = req.body.html
+  const transporter = nodemailer.createTransport({
+  service : 'gmail',
+  auth : {
+    user : process.env.USER,
+    pass : process.env.PASS
+  },
+  tls: {
+      rejectUnauthorized: false //Remove when in development
+  }
+  })
+
+  const email = {
+    from: process.env.USER,
+    to: emailTo,
+    subject: 'Your Kanoah E-Receipt',
+    text: 'Welcome',
+    html : html
+  };
+
+  transporter.sendMail(email, function(error, success){
+    if (error) {
+        console.log(error);
+    } else {
+        console.log('Nodemailer Email sent: ' + success.response);
+    }
+})
 }
 
 // insert booking information
