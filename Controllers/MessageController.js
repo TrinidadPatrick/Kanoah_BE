@@ -169,26 +169,67 @@ module.exports.retrieveContacts = async (req,res) => {
 module.exports.getMessages = async (req,res) => {
     const {conversationId} = req.params
     const {returnLimit} = req.params
+    const {service} = req.params
     const accessToken = req.cookies.accessToken
 
-    const getMessage = async (user) => {
-        try {
-            const documentCount = await messages.countDocuments({ conversationId: conversationId})
-            const messagesArray = await messages
-                .find({ conversationId: conversationId})
-                .skip(0)
-                .limit(returnLimit)
-                .sort({
-                    'createdAt' : -1
-                }).populate('virtualServiceInquired', 'basicInformation serviceProfileImage').populate('participants', '_id profileImage firstname lastname')
-                .exec();
-                // console.log(documentCount)
-            const result = messagesArray.reverse()
-            return res.json({result, documentCount});
-        } catch (error) {
-            return res.status(404).send({status : "failed"})
+    // const getMessage = async (user) => {
+    //     try {
+    //         const documentCount = await messages.countDocuments({ conversationId: conversationId})
+    //         const messagesArray = await messages
+    //             .find({ conversationId: conversationId})
+    //             .skip(0)
+    //             .limit(returnLimit)
+    //             .sort({
+    //                 'createdAt' : -1
+    //             }).populate('virtualServiceInquired', 'basicInformation serviceProfileImage').populate('participants', '_id profileImage firstname lastname')
+    //             .exec();
+    //             // console.log(documentCount)
+    //         const result = messagesArray.reverse()
+    //         return res.json({result, documentCount});
+    //     } catch (error) {
+    //         return res.status(404).send({status : "failed"})
+    //     }
+    // }   
+
+    const getMessage = async (userId) => {
+        if(conversationId !== "null")
+        {
+            try {
+                // const documentCount = await messages.countDocuments({ conversationId: conversationId})
+                const messagesArray = await messages
+                    .find({ conversationId: conversationId})
+                    .skip(0)
+                    .limit(returnLimit)
+                    .sort({
+                        'createdAt' : -1
+                    }).populate('virtualServiceInquired', 'basicInformation serviceProfileImage').populate('participants', '_id profileImage firstname lastname')
+                    .exec();
+                const result = messagesArray.reverse()
+                return res.json({result});
+            } catch (error) {
+                return res.status(404).send({status : "failed"})
+            }
         }
-    }   
+        else if(conversationId === "null") //this just means that the user clicks chat now from the view service
+        {
+            try {
+                // const documentCount = await messages.countDocuments({$and : [{ serviceInquired: service}, {participants : {$in : userId}}]})
+                const messagesArray = await messages
+                    .find({$and : [{ serviceInquired: service}, {participants : {$in : userId}}]})
+                    .skip(0)
+                    .limit(returnLimit)
+                    .sort({
+                        'createdAt' : -1
+                    }).populate('virtualServiceInquired', 'basicInformation serviceProfileImage').populate('participants', '_id profileImage firstname lastname')
+                    .exec();
+                const result = messagesArray.reverse()
+                return res.json({result});
+            } catch (error) {
+                return res.status(404).send({status : "failed"})
+            }
+        }
+
+    } 
     
 
     if (!accessToken) {
