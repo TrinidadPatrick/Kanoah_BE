@@ -64,6 +64,13 @@ const ServiceSchema = new mongoose.Schema({
             type : Number,
             default : 1
         },
+        cancelationPolicy : {
+            type : {},
+            default : {
+                cancelTimeLimit : {day : 0, hour : 0, minutes : 0},
+                cancelPolicy : 'Upon booking, clients are unable to directly cancel their reservation but may request cancellation through the service provider. The cancellation timeframe is determined by the service provider.'
+            }
+        },
         isDeactivated : {
             type : Boolean,
             default : false

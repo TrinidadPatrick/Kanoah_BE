@@ -73,7 +73,7 @@ module.exports.CLIENT_getInProgressBooking = async (req,res) => {
     const getBookingInfo = async (_id) => {
         try {
             const result = await bookings.find({client : _id, $and : [{status : "INPROGRESS"}, {status : {$ne : "DELETED"}}]})
-            .populate('shop', 'serviceProfileImage basicInformation owner')
+            .populate('shop', 'serviceProfileImage basicInformation owner cancelationPolicy')
             return res.status(200).send(result)
         } catch (error) {
             return res.status(400).send({error})
