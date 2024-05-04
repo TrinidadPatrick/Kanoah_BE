@@ -287,6 +287,7 @@ module.exports.getServiceInfo = async (req,res) => {
         createdAgo : createdAgo,
         createdAt : service.createdAt,
         serviceOffers : service.serviceOffers,
+        cancelationPolicy : service.cancelationPolicy
       }, ratings : ratingsList}) 
     }
 
