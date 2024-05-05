@@ -46,7 +46,7 @@ module.exports.sendBookingReceipt = async (req,res) => {
     if (error) {
         console.log(error);
     } else {
-        console.log('Nodemailer Email sent: ' + success.response);
+      return res.status(200).json({status : "success"})
     }
 })
 }
