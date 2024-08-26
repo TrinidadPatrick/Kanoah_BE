@@ -20,7 +20,7 @@ const io = new Server(server, {
 });
 app.use(cors({
     credentials: true,
-    origin: ['http://localhost:3000','https://web-based-service-finder.vercel.app', 'https://kanoah.onrender.com', 'exp://192.168.55.106:8081', 'http://192.168.55.106:8081/_expo/loading', 'https://kanoah-web.vercel.app']
+    origin: ['http://localhost:3000','http://localhost:3001','https://web-based-service-finder.vercel.app', 'https://kanoah.onrender.com', 'exp://192.168.55.106:8081', 'http://192.168.55.106:8081/_expo/loading', 'https://kanoah-web.vercel.app']
 }))
 app.use(cookieParser())
 app.use(express.json())
